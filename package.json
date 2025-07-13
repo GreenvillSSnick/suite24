@@ -1,6 +1,6 @@
 {
-  "name": "my-node-app",
-  "version": "1.0.0",
+  "name": "suite24",
+  "version": "0.0.0",
   "description": "A simple Node.js application example",
   "main": "index.js",
   "scripts": {
