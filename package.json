@@ -4,7 +4,7 @@
   "description": "A simple Node.js application example",
   "main": "index.js",
   "scripts": {
-    "build": "node build"
+    "build": "node /src/index.js"
   },
   "keywords": [
     "node",
