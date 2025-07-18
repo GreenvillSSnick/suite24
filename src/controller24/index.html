@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Suite24 - Controller24</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      background: #111;
+      color: #eee;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #top-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #222;
+      padding: 10px 20px;
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    #top-bar .logo {
+      font-weight: bold;
+      color: #0ff;
+      font-size: 1.2rem;
+      letter-spacing: 2px;
+    }
+
+    #top-bar .buttons button {
+      background: #333;
+      border: none;
+      color: #fff;
+      padding: 6px 12px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: 600;
+      transition: background-color 0.2s ease;
+    }
+
+    #top-bar .buttons button:hover {
+      background: #0af;
+      color: white;
+    }
+
+    #top-bar {
+      display: flex;
+      justify-content: space-between; 
+      align-items: center;            
+    }
+
+    #top-bar .buttons {
+      display: flex;            
+      gap: 10px;                
+    }
+
+    #main {
+      display: flex;
+      flex-grow: 1;
+      height: calc(100vh - 52px);
+      overflow: hidden;
+    }
+
+    #sidebar {
+      width: 320px;
+      background: #1a1a1a;
+      padding: 20px;
+      box-sizing: border-box;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      user-select: text;
+    }
+
+    #sidebar h2 {
+      margin-top: 0;
+      color: #0ff;
+      font-weight: bold;
+      font-size: 1.4rem;
+      letter-spacing: 1.5px;
+      margin-bottom: 15px;
+    }
+
+    #pasteInput {
+      width: 100%;
+      resize: vertical;
+      font-family: monospace;
+      font-size: 14px;
+      min-height: 100px;
+      margin-bottom: 10px;
+      padding: 8px;
+      border-radius: 4px;
+      border: none;
+      background: #222;
+      color: #eee;
+      box-sizing: border-box;
+    }
+
+    button, input, select, textarea {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      font-size: 14px;
+      border-radius: 4px;
+      border: none;
+      box-sizing: border-box;
+      background: #222;
+      color: #eee;
+      font-family: monospace;
+    }
+
+    button {
+      background: #0af;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #08c;
+    }
+
+    #flightForm {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 15px;
+    }
+
+    /* Flight strips lists */
+    #stripLists {
+      flex-grow: 1;
+      overflow-y: auto;
+      margin-bottom: 15px;
+    }
+
+    #stripLists h3 {
+      margin-top: 0;
+      border-bottom: 1px solid #444;
+      padding-bottom: 5px;
+      color: #0ff;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      font-size: 1.1rem;
+    }
+
+    ul {
+      list-style: none;
+      padding-left: 10px;
+      margin-top: 5px;
+      margin-bottom: 15px;
+      max-height: 140px;
+      overflow-y: auto;
+      border: 1px solid #333;
+      border-radius: 5px;
+      background: #222;
+    }
+
+    li {
+      padding: 6px 4px;
+      border-bottom: 1px solid #444;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-family: monospace;
+      font-size: 13px;
+      color: #eee;
+    }
+
+    li:last-child {
+      border-bottom: none;
+    }
+
+    .edit-btn,
+    .delete-btn {
+      cursor: pointer;
+      margin-left: 10px;
+      font-size: 12px;
+      user-select: none;
+      color: #0af;
+      text-decoration: underline;
+      white-space: nowrap;
+    }
+
+    .delete-btn {
+      color: #f44;
+    }
+
+    #mapContainer {
+      flex-grow: 1;
+      position: relative;
+      border: 1px solid #333;
+      border-radius: 5px;
+      user-select: none;
+      overflow: hidden;
+      height: 100%;
+    }
+
+    #map {
+      height: 100%;
+      width: 100%;
+    }
+
+    .aircraft {
+      position: absolute;
+      cursor: grab;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 5px 8px;
+      border-radius: 5px;
+      user-select: none;
+      font-size: 12px;
+      font-family: monospace;
+      white-space: nowrap;
+      color: white;
+    }
+
+    .aircraft img {
+      width: 24px;
+      height: 24px;
+      pointer-events: none;
+    }
+
+    .aircraft-info div {
+      line-height: 1.2;
+    }
+
+    .yellow {
+      color: yellow;
+    }
+
+    .green {
+      color: limegreen;
+    }
+
+    .blue {
+      color: deepskyblue;
+    }
+
+    .pink {
+      color: hotpink;
+    }
+
+    .white {
+      color: white;
+    }
+
+    #mapContainer button,
+    #mapContainer > button {
+      position: absolute;
+      bottom: 15px;
+      left: 15px;
+      z-index: 9999;
+      background: #0af;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      width: auto;
+      max-width: 200px;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
+    }
+
+    #mapContainer button:first-child {
+      bottom: 60px;
+    }
+
+    #headingDisplay {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: rgba(0,0,0,0.7);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 14px;
+      pointer-events: none;
+      z-index: 1000;
+    }
+
+    #atisModal {
+      display: none;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: #222;
+      color: white;
+      padding: 20px;
+      border-radius: 8px;
+      z-index: 10000;
+      width: 350px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    #atisModal h3 {
+      margin-top: 0;
+    }
+
+    #atisModal input, #atisModal textarea {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+      font-family: monospace;
+      font-size: 14px;
+      border-radius: 4px;
+      border: none;
+      background: #222;
+      color: #eee;
+      box-sizing: border-box;
+    }
+
+    #atisModal textarea[readonly] {
+      background: #111;
+      resize: none;
+      color: #ccc;
+    }
+
+    #atisModal button {
+      margin-right: 10px;
+      background: #0af;
+      border: none;
+      color: white;
+      padding: 8px 12px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+
+    #atisModal button:hover {
+      background: #08c;
+    }
+
+    #atisModal button.close-btn {
+      background: #f44;
+    }
+  </style>
+</head>
+<body>
+  <div id="top-bar">
+    <div class="logo">Controller24</div>
+    <div class="buttons">
+      <button id="atisBtn">ATIS</button>
+      <button onclick="window.open('https://charts.awdevsoftware.org')">24Charts | By: awdev</button>
+      <button>PDC</button>
+    </div>
+  </div>
+
+  <div id="main">
+    <div id="sidebar">
+      <h2>Flight Plans</h2>
+      <textarea id="pasteInput" placeholder="Paste Flight Plan from #flight-plans channel here..."></textarea>
+      <button id="parseBtn">Fill</button>
+      <form id="flightForm" autocomplete="off">
+        <input placeholder="Callsign" id="callsign" required />
+        <input placeholder="Squawk (or leave blank)" id="squawk" />
+        <input placeholder="Aircraft Type" id="acft" required />
+        <input placeholder="Heading" id="heading" required />
+        <input placeholder="Speed" id="speed" required />
+        <input placeholder="Flight Level" id="flightLevel" required />
+        <input placeholder="Remarks" id="remarks" />
+        <input placeholder="Departing Airport ICAO" id="departing" />
+        <input placeholder="Arriving Airport ICAO" id="arriving" />
+        <input placeholder="Route" id="route" />
+        <select id="rules" required>
+          <option value="IFR">IFR</option>
+          <option value="VFR">VFR</option>
+        </select>
+        <select id="category" required>
+          <option value="departure">Departure</option>
+          <option value="arrival">Arrival</option>
+          <option value="passthrough">Passthrough</option>
+        </select>
+        <button type="submit">Create</button>
+      </form>
+
+      <div id="stripLists">
+        <h3>Departure</h3>
+        <ul id="departureList"></ul>
+        <h3>Arrival</h3>
+        <ul id="arrivalList"></ul>
+        <h3>Passthrough</h3>
+        <ul id="passthroughList"></ul>
+      </div>
+    </div>
+
+    <div id="mapContainer">
+      <div id="map"></div>
+      <div id="headingDisplay">Heading: —</div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+      const imageWidth = 14453;
+      const imageHeight = 13800;
+      const imageBounds = [
+        [0, 0],
+        [imageHeight, imageWidth]
+      ];
+      const map = L.map('map', {
+        crs: L.CRS.Simple,
+        minZoom: -5,
+        maxZoom: 5,
+        zoomSnap: 0.1,
+        zoomDelta: 0.25,
+        maxBounds: imageBounds,
+        maxBoundsViscosity: 1.0
+      }).setView([imageHeight / 2, imageWidth / 2], 0);
+      L.imageOverlay('map.png', imageBounds).addTo(map);
+      map.setMaxBounds(imageBounds);
+      map.attributionControl.addAttribution('<a href:"https://guns.lol/greenvillssnick">GreenvillSSnick</a>');
+    </script>
+    <script>
+      const mapContainer = document.getElementById('mapContainer');
+      const headingDisplay = document.createElement('div');
+      headingDisplay.id = 'headingDisplay';
+      headingDisplay.style.position = 'absolute';
+      headingDisplay.style.top = '10px';
+      headingDisplay.style.left = '50%';
+      headingDisplay.style.transform = 'translateX(-50%)';
+      headingDisplay.style.backgroundColor = 'rgba(0,0,0,0.7)';
+      headingDisplay.style.color = 'white';
+      headingDisplay.style.padding = '4px 8px';
+      headingDisplay.style.borderRadius = '4px';
+      headingDisplay.style.fontFamily = 'monospace';
+      headingDisplay.style.fontSize = '14px';
+      headingDisplay.style.pointerEvents = 'none';
+      headingDisplay.style.zIndex = '1000';
+      headingDisplay.textContent = 'Heading: —';
+      mapContainer.appendChild(headingDisplay);
+      let tempLine = null;
+      let tempStart = null;
+      let isNDown = false;
+      let vectorStart = null;
+      let isMDown = false;
+      let vectorLines = [];
+      let currentMouseLatLng = null;
+      let tempPermanentLine = null;
+      map.on('mousemove', (e) => {
+        currentMouseLatLng = e.latlng;
+        if (isNDown && tempLine && tempStart) {
+          tempLine.setLatLngs([tempStart, currentMouseLatLng]);
+          const heading = Math.round(getAngle(tempStart, currentMouseLatLng));
+          document.getElementById('headingDisplay').textContent = `Heading: ${heading}°`;
+        }
+        if (isMDown && vectorStart) {
+          if (!tempPermanentLine) {
+            tempPermanentLine = L.polyline([vectorStart, currentMouseLatLng], {
+              color: 'lime',
+              weight: 2,
+              dashArray: '4,6',
+            }).addTo(map);
+          } else {
+            tempPermanentLine.setLatLngs([vectorStart, currentMouseLatLng]);
+          }
+        }
+      });
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'n' && !isNDown) {
+          isNDown = true;
+          if (currentMouseLatLng) {
+            tempStart = currentMouseLatLng;
+            tempLine = L.polyline([tempStart, tempStart], {
+              color: 'cyan',
+              weight: 2,
+              dashArray: '4,6'
+            }).addTo(map);
+          }
+        }
+        if (e.key === 'm' && !isMDown) {
+          isMDown = true;
+          vectorStart = currentMouseLatLng;
+        }
+        if (e.key === 'b') {
+          vectorLines = vectorLines.filter(line => {
+            if (line._hover) {
+              map.removeLayer(line);
+              return false;
+            }
+            return true;
+          });
+        }
+      });
+      document.addEventListener('keyup', (e) => {
+        if (e.key === 'n' && isNDown) {
+          isNDown = false;
+          if (tempLine) {
+            map.removeLayer(tempLine);
+            tempLine = null;
+            tempStart = null;
+          }
+          document.getElementById('headingDisplay').textContent = `Heading: —`;
+        }
+        if (e.key === 'm' && isMDown) {
+          isMDown = false;
+          if (tempPermanentLine) {
+            map.removeLayer(tempPermanentLine);
+            tempPermanentLine = null;
+          }
+          if (vectorStart && currentMouseLatLng) {
+            const permanentLine = L.polyline([vectorStart, currentMouseLatLng], {
+              color: 'lime',
+              weight: 2,
+              dashArray: null
+            }).addTo(map);
+            permanentLine.on('mouseover', () => (permanentLine._hover = true));
+            permanentLine.on('mouseout', () => (permanentLine._hover = false));
+            vectorLines.push(permanentLine);
+            const heading = Math.round(getAngle(vectorStart, currentMouseLatLng));
+            headingDisplay.textContent = `Heading: ${heading}°`;
+          }
+          vectorStart = null;
+        }
+      });
+
+      function getAngle(p1, p2) {
+        const dx = p2.lng - p1.lng;
+        const dy = p2.lat - p1.lat;
+        let angle = Math.atan2(dx, dy) * (180 / Math.PI);
+        return (angle + 360) % 360;
+      }
+      const generateSquawk = () => {
+        let code;
+        do {
+          code = Math.floor(1000 + Math.random() * 9000);
+        } while (code === 0000);
+        return code.toString();
+      };
+      document.getElementById('atisBtn').addEventListener('click', () => {
+        document.getElementById('atisModal').style.display = 'block';
+      });
+
+      function generateATIS() {
+        const i = id => document.getElementById(id).value.trim();
+        const extraNotams = i('atisNotams') ? `\n${i('atisNotams')}` : '';
+        const output = `∎ ${i('atisAirport')} ATIS Information ${i('atisTag')} ∎
+**―――――――――――――――――――――――――――――――――――――**
+**Controller Callsign:** ${i('atisCallsign')}
+**―――――――――――――――――――――――――――――――――――――**
+**Aerodrome:**
+Max Taxi Speed: ${i('atisTaxi')}KT
+Max ACFT Size: ${i('atisSize')}
+Arrival Runway(s): ${i('atisArr')}
+Departure Runway(s): ${i('atisDep')}
+Pressure: ${i('atisPressure')}
+Winds: ${i('atisWinds')}
+
+**NOTAMS:**
+VFR ACFT say direction of flight, intentions in flight plan.
+Advise receipt of information ${i('atisTag')} on first contact.${extraNotams}
+
+**Charts:**
+Chart Pack Author: ${i('atisChartAuthor')}
+Chart Pack Link: ${i('atisChartLink')}
+**―――――――――――――――――――――――――――――――――――――**
+∎ End of ATIS Information ${i('atisTag')} ∎`;
+        document.getElementById('atisOutput').value = output;
+      }
+
+      function getFormValues() {
+        return {
+          callsign: document.getElementById('callsign').value.trim(),
+          squawk: document.getElementById('squawk').value.trim() || generateSquawk(),
+          acft: document.getElementById('acft').value.trim(),
+          heading: document.getElementById('heading').value.trim(),
+          speed: document.getElementById('speed').value.trim(),
+          flightLevel: document.getElementById('flightLevel').value.trim(),
+          remarks: document.getElementById('remarks').value.trim(),
+          departing: document.getElementById('departing').value.trim().toUpperCase(),
+          arriving: document.getElementById('arriving').value.trim().toUpperCase(),
+          route: document.getElementById('route').value.trim(),
+          rules: document.getElementById('rules').value,
+          category: document.getElementById('category').value
+        };
+      }
+
+      function clearForm() {
+        ['callsign', 'squawk', 'acft', 'heading', 'speed', 'flightLevel', 'remarks', 'departing', 'arriving', 'route'].forEach(id => {
+          document.getElementById(id).value = '';
+        });
+        document.getElementById('rules').value = 'IFR';
+        document.getElementById('category').value = 'departure';
+      }
+      document.getElementById('flightForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const data = getFormValues();
+        addFlightStrip(data);
+        clearForm();
+      });
+      document.getElementById('parseBtn').addEventListener('click', () => {
+        const text = document.getElementById('pasteInput').value;
+        const lines = text.split('\n');
+        const data = {};
+        lines.forEach(line => {
+          const [key, ...rest] = line.split(':');
+          if (!key || rest.length === 0) return;
+          const value = rest.join(':').trim();
+          switch (key.trim().toLowerCase()) {
+            case 'callsign':
+              data.callsign = value;
+              break;
+            case 'aircraft':
+              data.acft = value;
+              break;
+            case 'flight rules':
+              data.rules = value.toUpperCase();
+              break;
+            case 'departing':
+              data.departing = value.toUpperCase();
+              break;
+            case 'arriving':
+              data.arriving = value.toUpperCase();
+              break;
+            case 'route':
+              data.route = value;
+              break;
+            case 'flight level':
+              data.flightLevel = value;
+              break;
+          }
+        });
+        for (const key in data) {
+          if (document.getElementById(key)) {
+            document.getElementById(key).value = data[key];
+          }
+        }
+      });
+
+      function addFlightStrip(data) {
+        const list = document.getElementById(data.category + 'List');
+        const li = document.createElement('li');
+        li.textContent = `${data.callsign} (${data.acft}) [${data.rules}]`;
+        const editBtn = document.createElement('span');
+        editBtn.textContent = '[Edit]';
+        editBtn.className = 'edit-btn';
+        const deleteBtn = document.createElement('span');
+        deleteBtn.textContent = '[Delete]';
+        deleteBtn.className = 'delete-btn';
+        li.appendChild(editBtn);
+        li.appendChild(deleteBtn);
+        list.appendChild(li);
+        const pin = createAircraftPin(data);
+        editBtn.addEventListener('click', () => {
+          loadFormWithData(data, li, pin);
+        });
+        deleteBtn.addEventListener('click', () => {
+          li.remove();
+          pin.remove();
+        });
+      }
+
+      function loadFormWithData(data, listItem, pin) {
+        for (const key in data) {
+          if (document.getElementById(key)) {
+            document.getElementById(key).value = data[key];
+          }
+        }
+        listItem.remove();
+        pin.remove();
+      }
+
+      function createAircraftPin({
+        callsign,
+        squawk,
+        heading,
+        flightLevel,
+        remarks,
+        rules,
+        route
+      }) {
+        const lat = 0 + Math.random() * 10 - 5;
+        const lng = 0 + Math.random() * 10 - 5;
+        const popupContent = `
+							
+						
+							
+						<div style="font-family: monospace; font-size: 13px; color: white;">
+							<div>
+								<span style="color: yellow;">${callsign}</span>
+								<span style="color: limegreen;">${squawk}</span>
+							</div>
+							<div>
+								<span style="color: deepskyblue;">FL${flightLevel}</span>
+								<span style="color: hotpink;">HDG ${heading}</span>
+							</div>
+							<div>
+								<span style="color: white;">RMK ${remarks} [${rules}]</span>
+							</div>
+							<div style="font-size: 10px; color: lightgray; white-space: pre-wrap;">Route: ${route}</div>
+						</div>
+  `;
+        const airplaneIcon = L.icon({
+          iconUrl: '/plane.png',
+          iconSize: [24, 24],
+          iconAnchor: [12, 12]
+        });
+        const marker = L.marker([lat, lng], {
+          icon: airplaneIcon,
+          draggable: true,
+          title: callsign
+        }).addTo(map);
+        marker.bindPopup(popupContent);
+        return marker;
+      }
+    </script>
+    <div id="atisModal" style="
+  display: none;
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background: #222;
+  color: white;
+  padding: 20px;
+  border-radius: 8px;
+  z-index: 10000;
+  width: 350px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 0 20px rgba(0,0,0,0.5);
+">
+      <h3 style="margin-top: 0;">ATIS Generator</h3>
+      <input id="atisAirport" placeholder="Airport ICAO (e.g. IRFD)" />
+      <input id="atisTag" placeholder="ATIS Tag (e.g. A)" />
+      <input id="atisCallsign" placeholder="Controller Callsign (e.g. Rockford Center)" />
+      <input id="atisTaxi" placeholder="Max Taxi Speed (e.g. 30 | Dont include KTS)" />
+      <input id="atisSize" placeholder="Max ACFT Size (e.g. A380 or N/A)" />
+      <input id="atisArr" placeholder="Arrival Runways (e.g. 25L, 25R, etc)" />
+      <input id="atisDep" placeholder="Departure Runways (e.g. 25L, 25C, etc)" />
+      <input id="atisPressure" placeholder="Pressure (e.g. 1014 QNH | Include QNH)" />
+      <input id="atisWinds" placeholder="Winds (e.g. 270@10KT)" />
+      <textarea id="atisNotams" placeholder="Additional NOTAMS (optional | e.g. NEW ATC, PLEASE BE PATIENT)" style="height: 60px;"></textarea>
+      <input id="atisChartAuthor" placeholder="Chart Pack Author" />
+      <input id="atisChartLink" placeholder="Chart Link" />
+      <textarea id="atisOutput" readonly style="height: 180px; margin-top: 10px; font-family: monospace; font-size: 12px;"></textarea>
+      <button onclick="generateATIS()">Generate</button>
+      <button onclick="document.getElementById('atisModal').style.display='none'" style="background:#f44;">Close</button>
+    </div>
+</body>
+</html>
