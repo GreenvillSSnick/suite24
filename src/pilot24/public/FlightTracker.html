@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>ATC24 Radar Tracker</title>
+
+  <!-- Leaflet core -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+  <!-- Leaflet Sidebar plugin -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-sidebar-v2/css/leaflet-sidebar.min.css" />
+  <script src="https://unpkg.com/leaflet-sidebar-v2/js/leaflet-sidebar.min.js"></script>
+
+  <!-- Custom styling and logic -->
+  <link rel="stylesheet" href="flighttrackerstyle.css">
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div id="map"></div>
+
+  <div class="radar-sidebar">
+    <div class="sidebar-tabs">
+      <div class="tab"><img src="icons/flightplan.png" alt=""> FLIGHTPLAN</div>
+      <div class="tab"><img src="icons/documents.png" alt=""> DOCUMENTS</div>
+      <div class="tab"><img src="icons/airports.png" alt=""> AIRPORTS</div>
+      <div class="tab" id="aircraft-tab"><img src="icons/aircraft.png" alt=""> AIRCRAFT</div>
+      <div class="tab"><img src="icons/maps.png" alt=""> MAPS</div>
+    </div>
+    <div class="sidebar-footer">
+      <button class="settings-btn"><img src="icons/settings.png" alt=""> SETTINGS</button>
+    </div>
+  </div>
+
+<div id="aircraft-sidebar" class="aircraft-sidebar hidden">
+
+  <button id="close-aircraft-sidebar" class="close-btn">×</button>
+
+  <div class="aircraft-name-section">
+    <h2 id="aircraft-callsign">N/A</h2>
+    <h3 id="aircraft-type">N/A</h3>
+    <h3 id="livery-airline">N/A</h3>
+  </div>
+
+  <img id="aircraft-image" src="" alt="Aircraft Image">
+
+  <div class="route-data">
+    <div class="dep-info">
+      <h2 id="dep-airport">N/A</h2>
+      <h3 id="dep-timezone">N/A</h3>
+      <h3 id="dep-time">N/A</h3>
+    </div>
+
+    <div class="arr-info">
+      <h2 id="arr-airport">N/A</h2>
+      <h3 id="arr-timezone">N/A</h3>
+      <h3 id="arr-time">N/A</h3>
+    </div>
+
+    <div class="flight-progress">
+      <!--progress bar thing-->
+      <p class="distance-time-covered">N/A</p>
+      <p class="estimated-distance-time-left">N/A</p>
+    </div>
+
+  </div>
+
+  <div class="aircraft-info">
+    <div class="flight-info">
+      <p id="aircraft-type-full">N/A</p>
+      <p id="Pilot">N/A</p>
+      <p id="Squawk">N/A</p>
+      <p id="Discord-Flightplan-Link">N/A</p>
+      <p id="flight-rules">N/A</p>
+    </div>
+
+    <div class="location-info">
+      <p id="altitude">N/A</p>
+      <p id="vertical speed">N/A</p>
+      <p id="coordinates">N/A</p>
+      <p id="speed">N/A</p>
+      <p id="groundspeed">N/A</p>
+      <p id="FIR-UIR">N/A</p>
+      <p id="track">N/A</p>
+    </div>
+  </div>
+</div>
+
+  <div class="corner-info">
+    <div class="clock-row">
+      <img src="icons/clock.png" alt="Clock"> <span id="utc-time">--:--:-- UTC</span>
+    </div>
+    <div class="wind-row">
+      <img src="icons/wind.png" alt="Wind"> <span id="wind-info">---° @ --kts</span>
+    </div>
+  </div>
+
+  <script src="flighttrackerjs.js"></script>
+</body>
+</html>
