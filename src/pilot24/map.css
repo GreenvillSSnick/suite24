@@ -1,10 +1,7 @@
-@import url('style.css');
-
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  background-color: #66ccff;
 }
 
 #map {
@@ -14,4 +11,10 @@ html, body {
 
 .leaflet-container {
   background-color: #3c5a7e !important;
+}
+
+.aircraft-icon img {
+  pointer-events: none;
+  transition: transform 0.3s linear;
+  image-rendering: auto;
 }
