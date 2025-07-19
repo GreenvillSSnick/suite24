@@ -2,6 +2,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
+const port = process.env.PORT || 3000;
+
 http.createServer((req, res) => {
   fs.readFile(path.join(__dirname, 'index.html'), (err, data) => {
     if (err) {
