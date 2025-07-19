@@ -19,7 +19,7 @@ window.onload = function () {
     attributionControl: false
   });
 
-  L.imageOverlay("basicairspaceupgraded.png", bounds).addTo(map);
+  L.imageOverlay("images/ptfsmapfullres.png", bounds).addTo(map);
   map.fitBounds(bounds);
 
   const ptfsOrigin = { x: -46040, y: 27767 };
@@ -60,7 +60,7 @@ window.onload = function () {
         } else {
           const aircraftIcon = L.divIcon({
   className: 'rotated-aircraft-icon',
-  html: `<img src="icons/aircraft/default/testaircrafticon.png" 
+  html: `<img src="icons/aircraft/default/testaircraft.png" 
               style="transform: rotate(${(acft.heading - 90 + 360) % 360}deg); width: 32px; height: 32px;">`,
   iconSize: [32, 32],
   iconAnchor: [16, 16]
