@@ -39,7 +39,7 @@ window.onload = function () {
 
   async function fetchAircraft() {
     try {
-      const response = await fetch("/api/aircraft");
+      const response = await fetch("https://24controllerdata.devp1234567891.workers.dev/");
       if (!response.ok) {
         console.error("API error:", response.status);
         return;
@@ -125,7 +125,7 @@ function parseWindString(windStr) {
 
 async function updateWindDisplay() {
   try {
-    const response = await fetch("/api/aircraft");
+    const response = await fetch("https://24controllerdata.devp1234567891.workers.dev/");
     if (!response.ok) throw new Error(`API error: ${response.status}`);
     const data = await response.json();
 
