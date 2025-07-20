@@ -40,6 +40,9 @@ function apiPositionToLatLng(apiX, apiY) {
 }
 
 const aircraftMarkers = new Map();
+const aircraftPaths = new Map();
+const aircraftTrailLayers = new Map();
+const aircraftTrailVisible = new Map();
 
 async function fetchAndPlotAircraft() {
   try {
@@ -52,6 +55,14 @@ async function fetchAndPlotAircraft() {
       if (!activeSet.has(oldCallsign)) {
         map.removeLayer(aircraftMarkers.get(oldCallsign));
         aircraftMarkers.delete(oldCallsign);
+
+        if (aircraftTrailLayers.has(oldCallsign)) {
+          map.removeLayer(aircraftTrailLayers.get(oldCallsign));
+          aircraftTrailLayers.delete(oldCallsign);
+        }
+
+        aircraftPaths.delete(oldCallsign);
+        aircraftTrailVisible.delete(oldCallsign);
       }
     }
 
@@ -75,7 +86,6 @@ async function fetchAndPlotAircraft() {
         });
 
         const marker = L.marker([lat, lng], { icon }).addTo(map);
-
         marker.bindPopup(`
           <b>${callsign}</b><br>
           Type: ${ac.aircraftType}<br>
@@ -85,8 +95,60 @@ async function fetchAndPlotAircraft() {
           Heading: ${ac.heading}°
         `);
 
+        marker.on('click', () => {
+          const path = aircraftPaths.get(callsign);
+          if (!path) return;
+
+          const trailShown = aircraftTrailVisible.get(callsign) || false;
+
+          // Hide all trails
+          for (const [otherCallsign, polyline] of aircraftTrailLayers.entries()) {
+            map.removeLayer(polyline);
+            aircraftTrailVisible.set(otherCallsign, false);
+          }
+
+          // Toggle current trail
+          if (!trailShown) {
+            const polyline = L.polyline(path, {
+              color: 'blue',
+              weight: 2,
+              opacity: 0.7,
+              smoothFactor: 1
+            }).addTo(map);
+            aircraftTrailLayers.set(callsign, polyline);
+            aircraftTrailVisible.set(callsign, true);
+          } else {
+            aircraftTrailVisible.set(callsign, false);
+          }
+        });
+
         aircraftMarkers.set(callsign, marker);
+        aircraftTrailVisible.set(callsign, false);
       }
+
+      if (!aircraftPaths.has(callsign)) {
+        aircraftPaths.set(callsign, []);
+      }
+
+      const path = aircraftPaths.get(callsign);
+      const last = path[path.length - 1];
+      if (!last || last[0] !== lat || last[1] !== lng) {
+        path.push([lat, lng]);
+      }
+
+      // If trail is visible, update it live
+if (aircraftTrailVisible.get(callsign)) {
+  if (aircraftTrailLayers.has(callsign)) {
+    map.removeLayer(aircraftTrailLayers.get(callsign));
+  }
+  const updatedPolyline = L.polyline(path, {
+    color: 'blue',
+    weight: 2,
+    opacity: 0.7,
+    smoothFactor: 1
+  }).addTo(map);
+  aircraftTrailLayers.set(callsign, updatedPolyline);
+}
     }
   } catch (err) {
     console.error('Error fetching aircraft data:', err);
