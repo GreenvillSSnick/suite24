@@ -250,6 +250,7 @@ function calculateAngle(p1, p2) {
   return angleDeg.toFixed(1);
 }
 
+//this function isnt that good and needs rework
 function calculateDistanceNM(p1, p2) {
   // PTFS bounds in studs
   const ptfsWidthStuds = 47132.9 - (-49222.1);
