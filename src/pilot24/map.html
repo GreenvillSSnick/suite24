@@ -107,6 +107,14 @@
 </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+  import { getFirestore, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+  import './map.js';
+  
+  // Optionally, you can initialize Firebase here and export db for use in map.js,
+  // or you can move your Firebase initialization code into map.js directly.
+</script>
   <script src="map.js"></script>
 </body>
 </html>

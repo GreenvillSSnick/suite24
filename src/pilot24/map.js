@@ -1,3 +1,5 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+
 const imageWidth = 14453;
 const imageHeight = 13800;
 const imageBounds = [[0, 0], [imageHeight, imageWidth]];
@@ -6,6 +8,22 @@ const ptfsBounds = {
   top_left:     { x: -49222.1, y: -45890.8 },
   bottom_right: { x:  47132.9, y:  46139.2 }
 };
+
+async function updateAircraftPathInFirebase(callsign, path) {
+  try {
+    await setDoc(doc(db, "aircraftPaths", callsign), { path });
+  } catch (e) {
+    console.error("Error updating Firebase path:", e);
+  }
+}
+
+async function deleteAircraftPathFromFirebase(callsign) {
+  try {
+    await deleteDoc(doc(db, "aircraftPaths", callsign));
+  } catch (e) {
+    console.error("Error deleting Firebase path:", e);
+  }
+}
 
 const ptfsCenter = {
   x: (ptfsBounds.top_left.x + ptfsBounds.bottom_right.x) / 2,
@@ -207,9 +225,6 @@ function parseWindString(windStr) {
   const [dir, spd] = windStr.split("/").map(Number);
   return { direction: dir, speed: spd };
 } 
-
-updateWindDisplay();
-setInterval(updateWindDisplay, 5000);
 
 const windDisplay = document.getElementById("wind-display");
 if (windDisplay) {
