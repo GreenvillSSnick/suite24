@@ -28,7 +28,7 @@ const map = L.map("map", {
   zoomControl: false
 });
 
-L.imageOverlay("images/ptfsmapfullres.png", imageBounds).addTo(map);
+L.imageOverlay("/src/unified/images/map/ptfsmapfullres.png", imageBounds).addTo(map);
 map.setView([imageHeight / 2, imageWidth / 2], 0);
 
 function apiPositionToLatLng(apiX, apiY) {
@@ -95,7 +95,7 @@ async function fetchAndPlotAircraft() {
       } else {
         const icon = L.divIcon({
           className: "aircraft-icon",
-          html: `<img src="icons/aircraft/default/testaircraft.png" style="transform: rotate(${heading}deg); width: 32px; height: 32px;">`,
+          html: `<img src="/src/unified/icons/aircraft/default/testaircraft.png" style="transform: rotate(${heading}deg); width: 32px; height: 32px;">`,
           iconSize: [32, 32],
           iconAnchor: [16, 16]
         });
