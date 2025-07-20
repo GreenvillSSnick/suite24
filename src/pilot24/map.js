@@ -225,3 +225,123 @@ if (windDisplay) {
   windDisplay.style.left = "auto";
   windDisplay.style.right = "5px";
 }
+
+document.querySelector(".settings-btn").addEventListener("click", () => {
+  document.getElementById("settings-sidebar").classList.remove("hidden");
+});
+
+document.getElementById("close-settings-sidebar").addEventListener("click", () => {
+  document.getElementById("settings-sidebar").classList.add("hidden");
+});
+
+let wHeld = false;
+let startPoint = null;
+let tempLine = null;
+let infoLabel = null;
+
+// Approximate conversion: 1 pixel ≈ 0.00053996 nm (based on 1 pixel ≈ 1 meter)
+const pixelToNM = 1 / 1852;
+
+function calculateAngle(p1, p2) {
+  const dx = p2.lng - p1.lng;
+  const dy = p2.lat - p1.lat;
+  let angleDeg = (Math.atan2(dx, dy) * 180) / Math.PI;
+  if (angleDeg < 0) angleDeg += 360;
+  return angleDeg.toFixed(1);
+}
+
+function calculateDistanceNM(p1, p2) {
+  // PTFS bounds in studs
+  const ptfsWidthStuds = 47132.9 - (-49222.1);
+  const ptfsHeightStuds = 46139.2 - (-45890.8);
+
+  // Image dimensions in pixels
+  const imageWidth = 14453;
+  const imageHeight = 13800;
+
+  // Average studs per pixel
+  const studsPerPixelX = ptfsWidthStuds / imageWidth;
+  const studsPerPixelY = ptfsHeightStuds / imageHeight;
+  const studsPerPixel = (studsPerPixelX + studsPerPixelY) / 2;
+
+  // Conversion: 1 stud = 0.56 meters → meters per stud ÷ meters per nm
+  const nmPerStud = 0.56 / 1852;
+
+  // Pixel distance between points
+  const dx = p2.lng - p1.lng;
+  const dy = p2.lat - p1.lat;
+  const pixelDistance = Math.sqrt(dx * dx + dy * dy);
+
+  // Final distance in nautical miles
+  const distanceNM = pixelDistance * studsPerPixel * nmPerStud;
+  return distanceNM.toFixed(2);
+}
+
+document.addEventListener("keydown", (e) => {
+  if (e.key.toLowerCase() === "w") {
+    wHeld = true;
+  }
+});
+
+document.addEventListener("keyup", (e) => {
+  if (e.key.toLowerCase() === "w") {
+    wHeld = false;
+    if (tempLine) {
+      map.removeLayer(tempLine);
+      tempLine = null;
+    }
+    if (infoLabel) {
+      map.removeLayer(infoLabel);
+      infoLabel = null;
+    }
+    startPoint = null;
+  }
+});
+
+map.on("click", (e) => {
+  if (!wHeld) return;
+  startPoint = e.latlng;
+});
+
+map.on("mousemove", (e) => {
+  if (!wHeld || !startPoint) return;
+
+  const endPoint = e.latlng;
+  const points = [startPoint, endPoint];
+
+  if (tempLine) {
+    tempLine.setLatLngs(points);
+  } else {
+    tempLine = L.polyline(points, {
+      color: 'red',
+      weight: 2,
+      opacity: 0.8,
+      dashArray: "4,6"
+    }).addTo(map);
+  }
+
+  const angle = calculateAngle(startPoint, endPoint);
+  const distance = calculateDistanceNM(startPoint, endPoint);
+
+  if (infoLabel) {
+    infoLabel.setLatLng(endPoint);
+    infoLabel.setContent(`🧭 ${angle}°<br>📏 ${distance} nm`);
+  } else {
+    infoLabel = L.popup({
+      closeButton: false,
+      autoClose: false,
+      className: "line-info-popup"
+    })
+      .setLatLng(endPoint)
+      .setContent(`🧭 ${angle}°<br>📏 ${distance} nm`)
+      .addTo(map);
+  }
+});
+
+const dx = (p2.lng - p1.lng) * 2; // scale to full studs
+const dy = (p2.lat - p1.lat) * 2;
+
+const studDistance = Math.sqrt(dx * dx + dy * dy);
+const studToNM = 0.0003024; // meters-per-stud ÷ meters-per-nm
+
+const distanceNM = (studDistance * studToNM).toFixed(2);
