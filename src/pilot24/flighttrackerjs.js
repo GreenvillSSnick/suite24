@@ -21,19 +21,17 @@ window.onload = function () {
 
   L.imageOverlay("images/ptfsmapfullres.png", bounds).addTo(map);
   map.fitBounds(bounds);
+  map.setView([imageHeight / 2, imageWidth / 2], 0);
 
-  const ptfsOrigin = { x: -46040, y: 27767 };
-  const pixelOrigin = { x: 3024, y: 1096 };
-  const studsPerPixelX = 18.1;
-  const studsPerPixelY = 23.2;
+  
 
-  function convertPTFSCoords(x, y) {
-    const deltaX = x - ptfsOrigin.x;
-    const deltaY = y - ptfsOrigin.y;
-    const pixelX = pixelOrigin.x + deltaX / studsPerPixelX;
-    const pixelY = pixelOrigin.y - deltaY / studsPerPixelY;
-    return [pixelY, pixelX];
-  }
+  function apiPositionToLatLng(apiX, apiY) {
+  const dx = apiX - ptfsCenter.x;
+  const dy = apiY - ptfsCenter.y;
+  const mapX = (imageWidth / 2) + dx * scale;
+  const mapY = (imageHeight / 2) - dy * scale;
+  return [mapY, mapX];
+}
 
   const aircraftMarkers = {};
 
