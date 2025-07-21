@@ -84,7 +84,7 @@ async function fetchAircraftData() {
   plotAircraft(aircraft);
 }
 
-setInterval(fetchAircraftData, 1000);
+setInterval(fetchAircraftData, 500);
 
 function plotAircraft(data) {
   const callsigns = Object.keys(data);
