@@ -1,5 +1,44 @@
 const socket = new WebSocket('wss://24data.ptfs.app/wss');
 
+const flightPlansByUser = {};
+
+socket.addEventListener('message', (event) => {
+  try {
+    const data = JSON.parse(event.data);
+
+    // Detect if this is a flight plan (contains robloxName)
+    if (data.robloxName && data.realcallsign) {
+      flightPlansByUser[data.robloxName] = data;
+      console.log(`Stored plan for ${data.robloxName}`);
+    }
+  } catch (e) {
+    console.error('Bad JSON from WebSocket:', event.data);
+  }
+});
+
+for (const [callsign, aircraftData] of Object.entries(liveAircraft)) {
+  const robloxName = aircraftData.playerName;
+  const pos = aircraftData.position;
+
+  const flightPlan = flightPlansByUser[robloxName];
+  let label;
+
+  if (flightPlan && flightPlan.realcallsign) {
+    label = `${flightPlan.realcallsign} (${robloxName})`;
+  } else {
+    label = `${callsign} (${robloxName})`; // fallback if no flight plan
+  }
+
+  drawAircraftIcon(pos, label, aircraftData);
+}
+
+const activeUsers = new Set(Object.values(liveAircraft).map(acft => acft.playerName));
+for (const user in flightPlansByUser) {
+  if (!activeUsers.has(user)) {
+    delete flightPlansByUser[user];
+  }
+}
+
 const imageWidth = 14453;
 const imageHeight = 13800;
 const imageBounds = [[0, 0], [imageHeight, imageWidth]];
