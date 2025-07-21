@@ -4,6 +4,7 @@ html, body {
   padding: 0;
   font-family: 'Share Tech', sans-serif !important;
   background-color: #1e1e1e;
+  overflow: hidden;
 }
 
 #map {
@@ -266,4 +267,9 @@ html, body {
   transform: translateX(-280px);
   pointer-events: none;
   opacity: 0;
+}
+
+.aircraft-sidebar,
+.settings-sidebar {
+  overflow-y: auto;
 }

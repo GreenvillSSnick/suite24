@@ -28,7 +28,7 @@ const map = L.map("map", {
   zoomControl: false
 });
 
-L.imageOverlay("/unified/images/map/ptfsmapfullres.png", imageBounds).addTo(map);
+L.imageOverlay("/src/unified/images/map/ptfsmapfullres.png", imageBounds).addTo(map);
 map.setView([imageHeight / 2, imageWidth / 2], 0);
 
 function apiPositionToLatLng(apiX, apiY) {
@@ -67,18 +67,7 @@ async function fetchAndPlotAircraft() {
     const data = await response.json();
     const callsigns = Object.keys(data);
     const activeSet = new Set(callsigns);
-const first = Object.values(data)[0];
-    const wind = parseWindString(first?.wind);
-    const el = document.getElementById("wind-info");
-    if (wind) {
-      el.textContent = `${wind.direction}° @ ${wind.speed}kts`;
-    } else {
-      el.textContent = "Wind data unavailable";
-    }
-  } catch (e) {
-    document.getElementById("wind-info").textContent = "Wind data unavailable";
-  }
-  
+
     for (const oldCallsign of aircraftMarkers.keys()) {
       if (!activeSet.has(oldCallsign)) {
         map.removeLayer(aircraftMarkers.get(oldCallsign));
@@ -106,7 +95,7 @@ const first = Object.values(data)[0];
       } else {
         const icon = L.divIcon({
           className: "aircraft-icon",
-          html: `<img src="/unified/icons/aircraft/default/testaircraft.png" style="transform: rotate(${heading}deg); width: 32px; height: 32px;">`,
+          html: `<img src="/src/unified/icons/aircraft/default/testaircraft.png" style="transform: rotate(${heading}deg); width: 32px; height: 32px;">`,
           iconSize: [32, 32],
           iconAnchor: [16, 16]
         });
@@ -210,6 +199,26 @@ function parseWindString(windStr) {
   const [dir, spd] = windStr.split("/").map(Number);
   return { direction: dir, speed: spd };
 }
+
+async function updateWindDisplay() {
+  try {
+    const response = await fetch("https://24controllerdata.devp1234567891.workers.dev/");
+    const data = await response.json();
+    const first = Object.values(data)[0];
+    const wind = parseWindString(first?.wind);
+    const el = document.getElementById("wind-info");
+    if (wind) {
+      el.textContent = `${wind.direction}° @ ${wind.speed}kts`;
+    } else {
+      el.textContent = "Wind data unavailable";
+    }
+  } catch (e) {
+    document.getElementById("wind-info").textContent = "Wind data unavailable";
+  }
+}
+
+updateWindDisplay();
+setInterval(updateWindDisplay, 5000);
 
 const windDisplay = document.getElementById("wind-display");
 if (windDisplay) {
