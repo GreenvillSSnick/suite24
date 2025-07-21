@@ -1,6 +1,7 @@
 {
   "name": "24flight",
   "version": "1.0.0",
+  "main": "src/index.js",
   "description": "A suite of untilities for ATC24.",
   "homepage": "https://github.com/GreenvillSSnick/suite24#readme",
   "bugs": {
@@ -13,7 +14,6 @@
   "license": "MIT",
   "author": "GreenvillSSnick & scythe_dev",
   "type": "commonjs",
-  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
