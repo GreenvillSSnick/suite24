@@ -3,7 +3,7 @@ const express = require('express');
 const path = require('path');
 
 const app = express();
-const PORT = 80;
+const PORT = 3000;
 
 let aircraftData = {};
 let flightPlans = {};
