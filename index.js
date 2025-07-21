@@ -8,7 +8,7 @@ const PORT = 80;
 let aircraftData = {};
 let flightPlans = {};
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '/public')));
 
 // Expose API for HTML files to get data
 app.get('/api/acft-data', (req, res) => {
