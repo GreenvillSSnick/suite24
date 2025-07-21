@@ -37,56 +37,55 @@
 
 <div id="aircraft-sidebar" class="aircraft-sidebar hidden">
 
+  <!-- ✖️ Close Button -->
   <button id="close-aircraft-sidebar" class="close-btn">×</button>
 
-  <div class="aircraft-name-section">
-    <h2 id="aircraft-callsign">N/A</h2>
-    <h3 id="aircraft-type">N/A</h3>
-    <h3 id="livery-airline">N/A</h3>
-  </div>
-
-  <img id="aircraft-image" src="" alt="Aircraft Image">
-
-  <div class="route-data">
-    <div class="dep-info">
-      <h2 id="dep-airport">N/A</h2>
-      <h3 id="dep-timezone">N/A</h3>
-      <h3 id="dep-time">N/A</h3>
-    </div>
-
-    <div class="arr-info">
-      <h2 id="arr-airport">N/A</h2>
-      <h3 id="arr-timezone">N/A</h3>
-      <h3 id="arr-time">N/A</h3>
-    </div>
-
-    <div class="flight-progress">
-      <!--progress bar thing-->
-      <p class="distance-time-covered">N/A</p>
-      <p class="estimated-distance-time-left">N/A</p>
-    </div>
-
-  </div>
-
-  <div class="aircraft-info">
-    <div class="flight-info">
-      <p id="aircraft-type-full">N/A</p>
-      <p id="Pilot">N/A</p>
-      <p id="Squawk">N/A</p>
-      <p id="Discord-Flightplan-Link">N/A</p>
-      <p id="flight-rules">N/A</p>
-    </div>
-
-    <div class="location-info">
-      <p id="altitude">N/A</p>
-      <p id="vertical speed">N/A</p>
-      <p id="coordinates">N/A</p>
-      <p id="speed">N/A</p>
-      <p id="groundspeed">N/A</p>
-      <p id="FIR-UIR">N/A</p>
-      <p id="track">N/A</p>
+  <!-- 🛫 Top Section -->
+  <div class="aircraft-header">
+    <img id="aircraft-image" src="images/default-plane.png" alt="Aircraft Image">
+    <div class="route-summary">
+      <h2 id="callsign">N/A</h2>
+      <p id="aircraft-type">N/A</p>
+      <p id="route-label">N/A → N/A</p>
     </div>
   </div>
+
+  <!-- 🔻 Collapsible Sections -->
+  <div class="section">
+    <button class="section-toggle red">Aircraft ▼</button>
+    <div class="section-content">
+      <p>Type: <span id="aircraft-type-full">N/A</span></p>
+      <p>Pilot: <span id="Pilot">N/A</span></p>
+      <p>Squawk: <span id="Squawk">N/A</span></p>
+      <p>Flightplan Link: <span id="Discord-Flightplan-Link">N/A</span></p>
+    </div>
+  </div>
+
+  <div class="section">
+    <button class="section-toggle orange">Location ▼</button>
+    <div class="section-content">
+      <p>Altitude: <span id="altitude">0 ft</span></p>
+      <p>Vertical Speed: <span id="vertical speed">0 ft/min</span></p>
+      <p>Coordinates: <span id="coordinates">(?, ?)</span></p>
+      <p>Speed: <span id="speed">0 kt</span></p>
+      <p>Groundspeed: <span id="groundspeed">0 kt</span></p>
+      <p>Position: <span id="FIR-UIR">N/A</span></p>
+      <p>Track: <span id="track">0°</span></p>
+    </div>
+  </div>
+
+  <div class="section">
+    <button class="section-toggle blue">Flightplan ▼</button>
+    <div class="section-content">
+      <p>Radar: <span id="Radar">N/A</span></p>
+      <p>Status: <span id="flight-rules">N/A</span></p>
+      <p>Route: <span id="Route">N/A</span></p>
+      <p>Flight Time: <span id="FlightTime">N/A</span></p>
+    </div>
+  </div>
+
+</div>
+
 </div>
 
   <div class="corner-info">
