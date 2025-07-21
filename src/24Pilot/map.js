@@ -28,7 +28,7 @@ const map = L.map("map", {
   zoomControl: false
 });
 
-L.imageOverlay("/src/unified/images/map/ptfsmapfullres.png", imageBounds).addTo(map);
+L.imageOverlay("/unified/images/map/ptfsmapfullres.png", imageBounds).addTo(map);
 map.setView([imageHeight / 2, imageWidth / 2], 0);
 
 function apiPositionToLatLng(apiX, apiY) {
@@ -67,7 +67,18 @@ async function fetchAndPlotAircraft() {
     const data = await response.json();
     const callsigns = Object.keys(data);
     const activeSet = new Set(callsigns);
-
+const first = Object.values(data)[0];
+    const wind = parseWindString(first?.wind);
+    const el = document.getElementById("wind-info");
+    if (wind) {
+      el.textContent = `${wind.direction}° @ ${wind.speed}kts`;
+    } else {
+      el.textContent = "Wind data unavailable";
+    }
+  } catch (e) {
+    document.getElementById("wind-info").textContent = "Wind data unavailable";
+  }
+  
     for (const oldCallsign of aircraftMarkers.keys()) {
       if (!activeSet.has(oldCallsign)) {
         map.removeLayer(aircraftMarkers.get(oldCallsign));
