@@ -66,24 +66,20 @@ document.getElementById("close-settings-sidebar").addEventListener("click", () =
   document.getElementById("settings-sidebar").classList.add("hidden");
 });
 
-function parseWindString(windStr) {
-  const match = /^\d{1,3}\/\d{1,3}$/.exec(windStr);
-  if (!match) return null;
-  const [dir, spd] = windStr.split("/").map(Number);
-  return { direction: dir, speed: spd };
-}
-
-function updateWindDisplay(data) {
-  const first = Object.values(data)[0];
-  const wind = parseWindString(first?.wind);
-  const el = document.getElementById("wind-info");
-  el.textContent = wind ? `${wind.direction}° @ ${wind.speed}kts` : "Wind data unavailable";
-}
-
 async function fetchAircraftData() {
   const res = await fetch('/api/acft-data');
   const json = await res.json();
   const aircraft = json.aircraftData;
+
+  // Update wind info from the first aircraft (or any aircraft with wind data)
+  const first = Object.values(aircraft)[0];
+  const windStr = first?.wind;
+  let windText = "Wind data unavailable";
+  if (windStr && /^\d{1,3}\/\d{1,3}$/.test(windStr)) {
+    const [dir, spd] = windStr.split("/").map(Number);
+    windText = `${dir}° @ ${spd}kts`;
+  }
+  document.getElementById("wind-info").textContent = windText;
 
   plotAircraft(aircraft);
 }
