@@ -106,7 +106,7 @@ const first = Object.values(data)[0];
       } else {
         const icon = L.divIcon({
           className: "aircraft-icon",
-          html: `<img src="/src/unified/icons/aircraft/default/testaircraft.png" style="transform: rotate(${heading}deg); width: 32px; height: 32px;">`,
+          html: `<img src="/unified/icons/aircraft/default/testaircraft.png" style="transform: rotate(${heading}deg); width: 32px; height: 32px;">`,
           iconSize: [32, 32],
           iconAnchor: [16, 16]
         });
