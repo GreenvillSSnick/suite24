@@ -211,26 +211,6 @@ function parseWindString(windStr) {
   return { direction: dir, speed: spd };
 }
 
-async function updateWindDisplay() {
-  try {
-    const response = await fetch("https://24controllerdata.devp1234567891.workers.dev/");
-    const data = await response.json();
-    const first = Object.values(data)[0];
-    const wind = parseWindString(first?.wind);
-    const el = document.getElementById("wind-info");
-    if (wind) {
-      el.textContent = `${wind.direction}° @ ${wind.speed}kts`;
-    } else {
-      el.textContent = "Wind data unavailable";
-    }
-  } catch (e) {
-    document.getElementById("wind-info").textContent = "Wind data unavailable";
-  }
-}
-
-updateWindDisplay();
-setInterval(updateWindDisplay, 5000);
-
 const windDisplay = document.getElementById("wind-display");
 if (windDisplay) {
   windDisplay.style.left = "auto";
