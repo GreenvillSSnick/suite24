@@ -28,7 +28,7 @@ const map = L.map("map", {
   zoomControl: false
 });
 
-L.imageOverlay("/public/unified/images/map/ptfsmapfullres.png", imageBounds).addTo(map);
+L.imageOverlay("/unified/images/map/ptfsmapfullres.png", imageBounds).addTo(map);
 map.setView([imageHeight / 2, imageWidth / 2], 0);
 
 function apiPositionToLatLng(apiX, apiY) {
@@ -123,7 +123,7 @@ function plotAircraft(data) {
     } else {
       const icon = L.divIcon({
         className: "aircraft-icon",
-        html: `<img src="/public/unified/icons/aircraft/default/testaircraft.png" style="transform: rotate(${heading}deg); width: 32px; height: 32px;">`,
+        html: `<img src="/unified/icons/aircraft/default/testaircraft.png" style="transform: rotate(${heading}deg); width: 32px; height: 32px;">`,
         iconSize: [32, 32],
         iconAnchor: [16, 16]
       });
@@ -321,7 +321,7 @@ function renderWaypoints(list) {
       html: `
         <div class="waypoint-wrapper" style="width:${size}px; height:${size}px;">
           <div class="waypoint-label">${name}</div>
-          <img src="/public/unified/icons/map/fix.RNAVFlyOver.png" style="width:${size}px; height:${size}px;">
+          <img src="/unified/icons/map/fix.RNAVFlyOver.png" style="width:${size}px; height:${size}px;">
         </div>
       `,
       iconSize: [size, size],
