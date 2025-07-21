@@ -39,8 +39,8 @@ function apiPositionToLatLng(apiX, apiY) {
   return [mapY, mapX];
 }
 
+let cachedFlightPlans = {};
 const aircraftMarkers = new Map();
-const aircraftPaths = new Map();
 const aircraftTrailLayers = new Map();
 const aircraftTrailVisible = new Map();
 
@@ -66,12 +66,54 @@ document.getElementById("close-settings-sidebar").addEventListener("click", () =
   document.getElementById("settings-sidebar").classList.add("hidden");
 });
 
+async function fetchAircraftPath(callsign) {
+  const response = await fetch(`/api/paths/${callsign}`);
+  if (!response.ok) {
+    console.error(`Failed to fetch path for ${callsign}:`, response.statusText);
+    return null;
+  }
+  const points = await response.json();
+  return points.map(p => apiPositionToLatLng(p.x, p.y));
+}
+
+async function saveAircraftPath(callsign, points) {
+  const response = await fetch(`/api/paths/${callsign}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(points)
+  });
+  if (!response.ok) {
+    console.error(`Failed to save path for ${callsign}:`, response.statusText);
+    return false;
+  }
+  return true;
+}
+
+async function deleteAircraftPath(callsign) {
+  const response = await fetch(`/api/paths/${callsign}`, {
+    method: 'DELETE'
+  });
+  if (!response.ok) {
+    console.error(`Failed to delete path for ${callsign}:`, response.statusText);
+    return false;
+  }
+  return true;
+}
+
+async function getOrInitAircraftPath(callsign) {
+  let path = await fetchAircraftPath(callsign);
+  if (!path) {
+    path = [];
+    await updateAircraftPath(callsign, path);
+  }
+  return path;
+}
+
 async function fetchAircraftData() {
   const res = await fetch('/api/acft-data');
   const json = await res.json();
   const aircraft = json.aircraftData;
 
-  // Update wind info from the first aircraft (or any aircraft with wind data)
   const first = Object.values(aircraft)[0];
   const windStr = first?.wind;
   let windText = "Wind data unavailable";
@@ -86,7 +128,7 @@ async function fetchAircraftData() {
 
 setInterval(fetchAircraftData, 500);
 
-function plotAircraft(data) {
+async function plotAircraft(data) {
   const callsigns = Object.keys(data);
   const activeSet = new Set(callsigns);
 
@@ -98,7 +140,7 @@ function plotAircraft(data) {
         map.removeLayer(aircraftTrailLayers.get(oldCallsign));
         aircraftTrailLayers.delete(oldCallsign);
       }
-      aircraftPaths.delete(oldCallsign);
+      await deleteAircraftPath(oldCallsign);
       aircraftTrailVisible.delete(oldCallsign);
     }
   }
@@ -107,8 +149,6 @@ function plotAircraft(data) {
     const ac = data[callsign];
     if (!ac.position) continue;
     const [lat, lng] = apiPositionToLatLng(ac.position.x, ac.position.y);
-    // Debug: log each aircraft's callsign and computed map position
-    console.log(`Aircraft: ${callsign}, PTFS: (${ac.position.x}, ${ac.position.y}), Map: (${lat}, ${lng})`);
     const heading = ac.heading || 0;
 
     if (aircraftMarkers.has(callsign)) {
@@ -126,16 +166,15 @@ function plotAircraft(data) {
 
       const marker = L.marker([lat, lng], { icon }).addTo(map);
 
-      marker.on("click", (e) => {
+      marker.on("click", async (e) => {
         L.DomEvent.stopPropagation(e);
         const sidebar = document.getElementById("aircraft-sidebar");
         sidebar.classList.remove("hidden");
         sidebar.style.left = "150px";
         sidebar.style.right = "auto";
-        document.getElementById("aircraft-image").src = ac.imageUrl || "images/default-plane.png";
+        document.getElementById("aircraft-image").src = ac.imageUrl || "/unified/images/plane/vulcanlong.png";
         document.getElementById("callsign").textContent = callsign || "N/A";
         document.getElementById("aircraft-type").textContent = ac.aircraftTypeFull || ac.aircraftType || "N/A";
-        document.getElementById("route-label").textContent = `${ac.departure?.airport || "?"} → ${ac.arrival?.airport || "?"}`;
         document.getElementById("aircraft-type-full").textContent = ac.aircraftTypeFull || "N/A";
         document.getElementById("Pilot").textContent = ac.playerName || "N/A";
         document.getElementById("Squawk").textContent = ac.squawk || "N/A";
@@ -153,7 +192,7 @@ function plotAircraft(data) {
         document.getElementById("Route").textContent = ac.route || ac.routePath || "N/A";
         document.getElementById("FlightTime").textContent = ac.flightTime || "N/A";
 
-        const path = aircraftPaths.get(callsign);
+        const path = await fetchAircraftPath(callsign);
         const trailShown = aircraftTrailVisible.get(callsign) || false;
 
         for (const [otherCallsign, polyline] of aircraftTrailLayers.entries()) {
@@ -179,8 +218,8 @@ function plotAircraft(data) {
       aircraftMarkers.set(callsign, marker);
     }
 
-    if (!aircraftPaths.has(callsign)) aircraftPaths.set(callsign, []);
-    const path = aircraftPaths.get(callsign);
+    await getOrInitAircraftPath(callsign);
+    const path = await fetchAircraftPath(callsign);
     const lastPos = path[path.length - 1];
     if (!lastPos || lastPos[0] !== lat || lastPos[1] !== lng) path.push([lat, lng]);
   }
