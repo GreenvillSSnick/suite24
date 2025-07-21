@@ -1,3 +1,5 @@
+const socket = new WebSocket('wss://24data.ptfs.app/wss');
+
 const imageWidth = 14453;
 const imageHeight = 13800;
 const imageBounds = [[0, 0], [imageHeight, imageWidth]];
@@ -101,6 +103,8 @@ function plotAircraft(data) {
     const ac = data[callsign];
     if (!ac.position) continue;
     const [lat, lng] = apiPositionToLatLng(ac.position.x, ac.position.y);
+    // Debug: log each aircraft's callsign and computed map position
+    console.log(`Aircraft: ${callsign}, PTFS: (${ac.position.x}, ${ac.position.y}), Map: (${lat}, ${lng})`);
     const heading = ac.heading || 0;
 
     if (aircraftMarkers.has(callsign)) {
@@ -120,40 +124,30 @@ function plotAircraft(data) {
 
       marker.on("click", (e) => {
         L.DomEvent.stopPropagation(e);
-
-// Show and position the sidebar
-const sidebar = document.getElementById("aircraft-sidebar");
-sidebar.classList.remove("hidden");
-sidebar.style.left = "150px";
-sidebar.style.right = "auto";
-
-// ✈️ Top Header Section
-document.getElementById("aircraft-image").src = ac.imageUrl || "images/default-plane.png";
-document.getElementById("callsign").textContent = callsign || "N/A";
-document.getElementById("aircraft-type").textContent = ac.aircraftTypeFull || ac.aircraftType || "N/A";
-document.getElementById("route-label").textContent = `${ac.departure?.airport || "?"} → ${ac.arrival?.airport || "?"}`;
-
-// 🔴 Aircraft Section (Red)
-document.getElementById("aircraft-type-full").textContent = ac.aircraftTypeFull || "N/A";
-document.getElementById("Pilot").textContent = ac.playerName || "N/A";
-document.getElementById("Squawk").textContent = ac.squawk || "N/A";
-document.getElementById("Discord-Flightplan-Link").textContent = ac.flightplanLink || "N/A";
-
-// 🟠 Location Section (Orange)
-document.getElementById("altitude").textContent = ac.altitude ? `${ac.altitude} ft` : "0 ft";
-document.getElementById("vertical speed").textContent = ac.verticalSpeed ? `${ac.verticalSpeed} ft/min` : "0 ft/min";
-document.getElementById("coordinates").textContent = ac.position?.x !== undefined && ac.position?.y !== undefined
-  ? `(${ac.position.x}, ${ac.position.y})` : "(?, ?)";
-document.getElementById("speed").textContent = ac.speed ? `${ac.speed} kt` : "0 kt";
-document.getElementById("groundspeed").textContent = ac.groundSpeed ? `${ac.groundSpeed} kt` : "0 kt";
-document.getElementById("FIR-UIR").textContent = ac.fir || "N/A";
-document.getElementById("track").textContent = `${ac.heading || 0}°`;
-
-// 🔵 Flightplan Section (Blue)
-document.getElementById("Radar").textContent = ac.playerName || "N/A";
-document.getElementById("flight-rules").textContent = ac.status || "N/A";
-document.getElementById("Route").textContent = ac.route || ac.routePath || "N/A";
-document.getElementById("FlightTime").textContent = ac.flightTime || "N/A";
+        const sidebar = document.getElementById("aircraft-sidebar");
+        sidebar.classList.remove("hidden");
+        sidebar.style.left = "150px";
+        sidebar.style.right = "auto";
+        document.getElementById("aircraft-image").src = ac.imageUrl || "images/default-plane.png";
+        document.getElementById("callsign").textContent = callsign || "N/A";
+        document.getElementById("aircraft-type").textContent = ac.aircraftTypeFull || ac.aircraftType || "N/A";
+        document.getElementById("route-label").textContent = `${ac.departure?.airport || "?"} → ${ac.arrival?.airport || "?"}`;
+        document.getElementById("aircraft-type-full").textContent = ac.aircraftTypeFull || "N/A";
+        document.getElementById("Pilot").textContent = ac.playerName || "N/A";
+        document.getElementById("Squawk").textContent = ac.squawk || "N/A";
+        document.getElementById("Discord-Flightplan-Link").textContent = ac.flightplanLink || "N/A";
+        document.getElementById("altitude").textContent = ac.altitude ? `${ac.altitude} ft` : "0 ft";
+        document.getElementById("vertical speed").textContent = ac.verticalSpeed ? `${ac.verticalSpeed} ft/min` : "0 ft/min";
+        document.getElementById("coordinates").textContent = ac.position?.x !== undefined && ac.position?.y !== undefined
+          ? `(${ac.position.x}, ${ac.position.y})` : "(?, ?)";
+        document.getElementById("speed").textContent = ac.speed ? `${ac.speed} kt` : "0 kt";
+        document.getElementById("groundspeed").textContent = ac.groundSpeed ? `${ac.groundSpeed} kt` : "0 kt";
+        document.getElementById("FIR-UIR").textContent = ac.fir || "N/A";
+        document.getElementById("track").textContent = `${ac.heading || 0}°`;
+        document.getElementById("Radar").textContent = ac.playerName || "N/A";
+        document.getElementById("flight-rules").textContent = ac.status || "N/A";
+        document.getElementById("Route").textContent = ac.route || ac.routePath || "N/A";
+        document.getElementById("FlightTime").textContent = ac.flightTime || "N/A";
 
         const path = aircraftPaths.get(callsign);
         const trailShown = aircraftTrailVisible.get(callsign) || false;
@@ -188,20 +182,46 @@ document.getElementById("FlightTime").textContent = ac.flightTime || "N/A";
   }
 }
 
-async function fetchRadarData() {
+socket.addEventListener('message', (event) => {
   try {
-    const response = await fetch("https://24controllerdata.devp1234567891.workers.dev/");
-    const data = await response.json();
-    updateWindDisplay(data);
-    plotAircraft(data);
+    console.log("WebSocket message:", event.data);
+    let data = JSON.parse(event.data);
+    if (data && typeof data === "object" && data.t !== undefined) {
+      return;
+    }
+    if (Array.isArray(data)) {
+      const obj = {};
+      for (const ac of data) {
+        if (ac.callsign) obj[ac.callsign] = ac;
+      }
+      data = obj;
+    }
+    if (data && typeof data === "object" && Object.keys(data).length > 0) {
+      console.log("Parsed aircraft data to plot:", data);
+      updateWindDisplay(data);
+      plotAircraft(data);
+    } else {
+      console.warn("WebSocket: Unexpected data format", data);
+    }
   } catch (err) {
-    console.error("Radar data fetch failed:", err);
+    console.error("WebSocket radar data error:", err);
     document.getElementById("wind-info").textContent = "Wind data unavailable";
   }
-}
+});
 
-fetchRadarData();
-setInterval(fetchRadarData, 5000);
+socket.addEventListener('open', () => {
+  console.log("WebSocket connection opened");
+  // Example: socket.send(JSON.stringify({type: "auth", token: "YOUR_TOKEN"}));
+});
+socket.addEventListener('close', (event) => {
+  console.log("WebSocket connection closed", event);
+  if (event.code || event.reason) {
+    console.log("Close code:", event.code, "Reason:", event.reason);
+  }
+});
+socket.addEventListener('error', (e) => {
+  console.error("WebSocket error", e);
+});
 
 function updateUTCClock() {
   const now = new Date();

@@ -112,6 +112,17 @@ html, body {
   font-family: 'Segoe UI', sans-serif;
   overflow-y: auto;
   z-index: 1000;
+  transition: transform 0.3s cubic-bezier(.4,0,.2,1), opacity 0.2s;
+  transform: translateX(100%);
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Show sidebar when not hidden */
+.aircraft-sidebar:not(.hidden) {
+  transform: translateX(0);
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .close-btn {
@@ -207,10 +218,6 @@ html, body {
   flex-direction: column;
   gap: 8px;
   z-index: 1200;
-}
-
-.aircraft-sidebar.hidden {
-  transform: translateX(-200%);
 }
 
 .corner-info img {
