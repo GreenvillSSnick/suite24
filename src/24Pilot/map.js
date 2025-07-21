@@ -1,44 +1,3 @@
-const socket = new WebSocket('wss://24data.ptfs.app/wss');
-
-const flightPlansByUser = {};
-
-socket.addEventListener('message', (event) => {
-  try {
-    const data = JSON.parse(event.data);
-
-    // Detect if this is a flight plan (contains robloxName)
-    if (data.robloxName && data.realcallsign) {
-      flightPlansByUser[data.robloxName] = data;
-      console.log(`Stored plan for ${data.robloxName}`);
-    }
-  } catch (e) {
-    console.error('Bad JSON from WebSocket:', event.data);
-  }
-});
-
-for (const [callsign, aircraftData] of Object.entries(liveAircraft)) {
-  const robloxName = aircraftData.playerName;
-  const pos = aircraftData.position;
-
-  const flightPlan = flightPlansByUser[robloxName];
-  let label;
-
-  if (flightPlan && flightPlan.realcallsign) {
-    label = `${flightPlan.realcallsign} (${robloxName})`;
-  } else {
-    label = `${callsign} (${robloxName})`; // fallback if no flight plan
-  }
-
-  drawAircraftIcon(pos, label, aircraftData);
-}
-
-const activeUsers = new Set(Object.values(liveAircraft).map(acft => acft.playerName));
-for (const user in flightPlansByUser) {
-  if (!activeUsers.has(user)) {
-    delete flightPlansByUser[user];
-  }
-}
-
 const imageWidth = 14453;
 const imageHeight = 13800;
 const imageBounds = [[0, 0], [imageHeight, imageWidth]];
@@ -80,10 +39,137 @@ function apiPositionToLatLng(apiX, apiY) {
   return [mapY, mapX];
 }
 
+function mergeData(playerName) {
+  const ac = aircraftDataMap.get(playerName) || {};
+  const fp = flightPlanMap.get(playerName) || {};
+  console.log( ...ac, ...fp );
+  return { ...ac, ...fp };
+}
+
 const aircraftMarkers = new Map();
 const aircraftPaths = new Map();
 const aircraftTrailLayers = new Map();
 const aircraftTrailVisible = new Map();
+const aircraftDataMap = new Map();
+const flightPlanMap = new Map();
+
+function updateAircraftMarkersAndSidebar() {
+  const players = Array.from(aircraftDataMap.keys()).sort((a, b) => a.localeCompare(b));
+  const sidebar = document.getElementById("aircraft-sidebar");
+  if (!sidebar) return;
+
+  const activePlayersSet = new Set(players);
+
+  // Remove markers for aircraft no longer present
+  for (const oldPlayer of aircraftMarkers.keys()) {
+    if (!activePlayersSet.has(oldPlayer)) {
+      map.removeLayer(aircraftMarkers.get(oldPlayer));
+      aircraftMarkers.delete(oldPlayer);
+    }
+  }
+
+  for (const playerName of players) {
+    const merged = mergeData(playerName);
+    if (!merged.position) continue;
+
+    const [lat, lng] = apiPositionToLatLng(merged.position.x, merged.position.y);
+    const heading = merged.heading || 0;
+
+    if (aircraftMarkers.has(playerName)) {
+      const marker = aircraftMarkers.get(playerName);
+      marker.setLatLng([lat, lng]);
+      const iconImg = marker.getElement()?.querySelector("img");
+      if (iconImg) iconImg.style.transform = `rotate(${heading}deg)`;
+    } else {
+      const icon = L.divIcon({
+        className: "aircraft-icon",
+        html: `<img src="/src/unified/icons/aircraft/default/testaircraft.png" style="transform: rotate(${heading}deg); width: 32px; height: 32px;">`,
+        iconSize: [32, 32],
+        iconAnchor: [16, 16]
+      });
+
+      const marker = L.marker([lat, lng], { icon }).addTo(map);
+
+      marker.on("click", (e) => {
+        L.DomEvent.stopPropagation(e);
+        sidebar.classList.remove("hidden");
+        sidebar.style.left = "150px";
+        sidebar.style.right = "auto";
+
+        // Update sidebar fields
+        document.getElementById("aircraft-image").src = merged.imageUrl || "images/default-plane.png";
+        document.getElementById("callsign").textContent = merged.callsign || "N/A";
+        document.getElementById("aircraft-type").textContent = merged.aircraftTypeFull || merged.aircraftType || "N/A";
+        document.getElementById("route-label").textContent = `${merged.departure?.airport || "?"} → ${merged.arrival?.airport || "?"}`;
+        document.getElementById("aircraft-type-full").textContent = merged.aircraftTypeFull || "N/A";
+        document.getElementById("Pilot").textContent = merged.playerName || "N/A";
+        document.getElementById("Squawk").textContent = merged.squawk || "N/A";
+        document.getElementById("Discord-Flightplan-Link").textContent = merged.flightplanLink || "N/A";
+        document.getElementById("altitude").textContent = merged.altitude ? `${merged.altitude} ft` : "0 ft";
+        document.getElementById("vertical speed").textContent = merged.verticalSpeed ? `${merged.verticalSpeed} ft/min` : "0 ft/min";
+        document.getElementById("coordinates").textContent = merged.position?.x !== undefined && merged.position?.y !== undefined
+          ? `(${merged.position.x}, ${merged.position.y})` : "(?, ?)";
+        document.getElementById("speed").textContent = merged.speed ? `${merged.speed} kt` : "0 kt";
+        document.getElementById("groundspeed").textContent = merged.groundSpeed ? `${merged.groundSpeed} kt` : "0 kt";
+        document.getElementById("FIR-UIR").textContent = merged.fir || "N/A";
+        document.getElementById("track").textContent = `${merged.heading || 0}°`;
+        document.getElementById("Radar").textContent = merged.playerName || "N/A";
+        document.getElementById("flight-rules").textContent = merged.status || "N/A";
+        document.getElementById("Route").textContent = merged.route || merged.routePath || "N/A";
+        document.getElementById("FlightTime").textContent = merged.flightTime || "N/A";
+      });
+
+      aircraftMarkers.set(playerName, marker);
+    }
+  }
+}
+
+const socket = new WebSocket("wss://24controllerdata.devp1234567891.workers.dev");
+
+socket.addEventListener("open", () => {
+  console.log("WebSocket connected.");
+});
+
+socket.addEventListener("message", (event) => {
+  console.log(event.data);
+  try {
+    const message = JSON.parse(event.data);
+    const { t: eventType, d: data } = message;
+
+    if (eventType === "ACFT_DATA" || eventType === "EVENT_ACFT_DATA") {
+      data.forEach(ac => {
+        if (ac.playerName) {
+          aircraftDataMap.set(ac.playerName, ac);
+        }
+      });
+    } else if (eventType === "FLIGHT_PLAN" || eventType === "EVENT_FLIGHT_PLAN") {
+      data.forEach(fp => {
+        if (fp.playerName) {
+          flightPlanMap.set(fp.playerName, fp);
+        }
+      });
+    }
+
+    // Build merged keyed object for plotAircraft
+    const mergedData = {};
+    for (const playerName of aircraftDataMap.keys()) {
+      mergedData[playerName] = mergeData(playerName);
+    }
+
+    plotAircraft(aircraftDataMap);  // <-- This will update map markers using your existing function
+    updateWindDisplay(aircraftDataMap);
+  } catch (err) {
+    console.error("Error parsing WebSocket message:", err);
+  }
+});  
+
+socket.addEventListener("close", () => {
+  console.log("WebSocket disconnected.");
+});
+
+socket.addEventListener("error", (err) => {
+  console.error("WebSocket error:", err);
+});
 
 map.on("click", () => {
   document.getElementById("aircraft-sidebar").classList.add("hidden");
@@ -220,47 +306,6 @@ function plotAircraft(data) {
     if (!lastPos || lastPos[0] !== lat || lastPos[1] !== lng) path.push([lat, lng]);
   }
 }
-
-socket.addEventListener('message', (event) => {
-  try {
-    console.log("WebSocket message:", event.data);
-    let data = JSON.parse(event.data);
-    if (data && typeof data === "object" && data.t !== undefined) {
-      return;
-    }
-    if (Array.isArray(data)) {
-      const obj = {};
-      for (const ac of data) {
-        if (ac.callsign) obj[ac.callsign] = ac;
-      }
-      data = obj;
-    }
-    if (data && typeof data === "object" && Object.keys(data).length > 0) {
-      console.log("Parsed aircraft data to plot:", data);
-      updateWindDisplay(data);
-      plotAircraft(data);
-    } else {
-      console.warn("WebSocket: Unexpected data format", data);
-    }
-  } catch (err) {
-    console.error("WebSocket radar data error:", err);
-    document.getElementById("wind-info").textContent = "Wind data unavailable";
-  }
-});
-
-socket.addEventListener('open', () => {
-  console.log("WebSocket connection opened");
-  // Example: socket.send(JSON.stringify({type: "auth", token: "YOUR_TOKEN"}));
-});
-socket.addEventListener('close', (event) => {
-  console.log("WebSocket connection closed", event);
-  if (event.code || event.reason) {
-    console.log("Close code:", event.code, "Reason:", event.reason);
-  }
-});
-socket.addEventListener('error', (e) => {
-  console.error("WebSocket error", e);
-});
 
 function updateUTCClock() {
   const now = new Date();

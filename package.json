@@ -1,0 +1,20 @@
+{
+  "name": "24flight",
+  "version": "1.0.0",
+  "description": "A suite of untilities for ATC24.",
+  "homepage": "https://github.com/GreenvillSSnick/suite24#readme",
+  "bugs": {
+    "url": "https://github.com/GreenvillSSnick/suite24/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GreenvillSSnick/suite24.git"
+  },
+  "license": "MIT",
+  "author": "GreenvillSSnick & scythe_dev",
+  "type": "commonjs",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
