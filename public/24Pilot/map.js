@@ -126,7 +126,23 @@ async function fetchAircraftData() {
   plotAircraft(aircraft);
 }
 
+async function updateVisibleAircraftTrails() {
+  for (const [callsign, visible] of aircraftTrailVisible.entries()) {
+    if (visible) {
+      const polyline = aircraftTrailLayers.get(callsign);
+      if (polyline) {
+        // Fetch the latest path points from your API or local cache
+        const newPath = await fetchAircraftPath(callsign);
+        if (newPath && newPath.length) {
+          polyline.setLatLngs(newPath);
+        }
+      }
+    }
+  }
+}
+
 setInterval(fetchAircraftData, 500);
+setInterval(updateVisibleAircraftTrails, 500);
 
 async function plotAircraft(data) {
   const callsigns = Object.keys(data);
