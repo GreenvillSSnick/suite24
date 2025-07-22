@@ -252,121 +252,138 @@ function updateUTCClock() {
 setInterval(updateUTCClock, 1000);
 
 const Waypoints = [
+
+  // Waypoints relative to the top left of the map image
+
+  // Top left corner
+  { name: "TOPLEFT", px: -14453*2, py: -13800*2, size: 64 }, // top left
+
+  // Center of map
+  { name: "CENTER", px: imageWidth / 2, py: imageHeight / 2, size: 64 }, // center
+
+  // Bottom right corner
+  { name: "BOTTOMRIGHT", px: imageWidth, py: imageHeight, size: 64 }, // bottom right
+
+  // Example: 100px right, 200px down from top left
+  { name: "EXAMPLE1", px: 100, py: 200, size: 64 },
+
   // Grindavik
-  { name: "BULLY", px: 3240, py: 1520, size: 64 }, //bully
-  { name: "FROOT", px: 3785, py: 1490, size: 64 }, //fruit
-  { name: "EURAD", px: 4030, py: 1732, size: 64 }, //Yurad
-  { name: "BOBOS", px: 3620, py: 1915, size: 64 }, //bowbows?
-  { name: "THENR", px: 3910, py: 2032, size: 64 }, //thenner
-  { name: "BLANK", px: 4194, py: 1526, size: 64 }, //blank
-  { name: "ACRES", px: 4435, py: 1672, size: 64 }, //acres
-  { name: "YOUTH", px: 4580, py: 1920, size: 64 }, //youth
-  { name: "UWAIS", px: 4785, py: 2048, size: 64 }, //Eww Wais
-  { name: "FRANK", px: 5032, py: 1715, size: 64 }, //Frank
-  { name: "CELAR", px: 5201, py: 1843, size: 64 }, //Sellar
-  { name: "EZYDB", px: 5442, py: 1964, size: 64 }, //EasyDub
-  { name: "THACC", px: 5580, py: 1710, size: 64 }, //Thack
-  { name: "SHREK", px: 5784, py: 1830, size: 64 }, //Shrek
-  { name: "SPACE", px: 6031, py: 2000, size: 64 }, //Space
+  { name: "BULLY", px: 0, py: 0, size: 64 }, //bully
+  { name: "FROOT", px: 0, py: 0, size: 64 }, //fruit
+  { name: "EURAD", px: 0, py: 0, size: 64 }, //Yurad
+  { name: "BOBOS", px: 0, py: 0, size: 64 }, //bowbows?
+  { name: "THENR", px: 0, py: 0, size: 64 }, //thenner
+  { name: "BLANK", px: 0, py: 0, size: 64 }, //blank
+  { name: "ACRES", px: 0, py: 0, size: 64 }, //acres
+  { name: "YOUTH", px: 0, py: 0, size: 64 }, //youth
+  { name: "UWAIS", px: 0, py: 0, size: 64 }, //Eww Wais
+  { name: "FRANK", px: 0, py: 0, size: 64 }, //Frank
+  { name: "CELAR", px: 0, py: 0, size: 64 }, //Sellar
+  { name: "EZYDB", px: 0, py: 0, size: 64 }, //EasyDub
+  { name: "THACC", px: 0, py: 0, size: 64 }, //Thack
+  { name: "SHREK", px: 0, py: 0, size: 64 }, //Shrek
+  { name: "SPACE", px: 0, py: 0, size: 64 }, //Space
 
   // Sauthemptona
-  { name: "HACKE", px: 6543, py: 2125, size: 64 }, //Hack
-  { name: "HECKS", px: 6715, py: 2260, size: 64 }, //Hecks
-  { name: "GEORG", px: 6891, py: 2503, size: 64 }, //George
-  { name: "SEEKS", px: 7002, py: 2780, size: 64 }, //Seeks
-  { name: "PACKT", px: 7150, py: 3015, size: 64 }, //Packet
-  { name: "ALDER", px: 7341, py: 3250, size: 64 }, //Alder
-  { name: "STACK", px: 7555, py: 3422, size: 64 }, //Stack
-  { name: "WASTE", px: 7721, py: 3650, size: 64 }, //Waste
-  { name: "HOGGS", px: 7880, py: 3870, size: 64 }, //Hoggs
-  { name: "ROBUX", px: 8100, py: 4085, size: 64 }, //Robux
+  { name: "HACKE", px: 0, py: 0, size: 64 }, //Hack
+  { name: "HECKS", px: 0, py: 0, size: 64 }, //Hecks
+  { name: "GEORG", px: 0, py: 0, size: 64 }, //George
+  { name: "SEEKS", px: 0, py: 0, size: 64 }, //Seeks
+  { name: "PACKT", px: 0, py: 0, size: 64 }, //Packet
+  { name: "ALDER", px: 0, py: 0, size: 64 }, //Alder
+  { name: "STACK", px: 0, py: 0, size: 64 }, //Stack
+  { name: "WASTE", px: 0, py: 0, size: 64 }, //Waste
+  { name: "HOGGS", px: 0, py: 0, size: 64 }, //Hoggs
+  { name: "ROBUX", px: 0, py: 0, size: 64 }, //Robux
 
   // Rockford
-  { name: "ENDER", px: 8405, py: 4290, size: 64 }, //Ender
-  { name: "SUNST", px: 8622, py: 4408, size: 64 }, //Sunset
-  { name: "BUCFA", px: 8811, py: 4642, size: 64 }, //Buckfuh
-  { name: "KENED", px: 8940, py: 4860, size: 64 }, //Keneddy? kened?
-  { name: "SETHR", px: 9122, py: 5055, size: 64 }, //Sether
-  { name: "KUNAV", px: 9312, py: 5192, size: 64 }, //Kunnov
-  { name: "HAWFA", px: 9515, py: 5320, size: 64 }, //Haw Fuh
-  { name: "SAWPE", px: 9684, py: 5535, size: 64 }, //Saw pee
-  { name: "BEANS", px: 9880, py: 5742, size: 64 }, //Beans
-  { name: "LOGAN", px: 10050, py: 5883, size: 64 }, //Logan
+  { name: "ENDER", px: 0, py: 0, size: 64 }, //Ender
+  { name: "SUNST", px: 0, py: 0, size: 64 }, //Sunset
+  { name: "BUCFA", px: 0, py: 0, size: 64 }, //Buckfuh
+  { name: "KENED", px: 0, py: 0, size: 64 }, //Keneddy? kened?
+  { name: "SETHR", px: 0, py: 0, size: 64 }, //Sether
+  { name: "KUNAV", px: 0, py: 0, size: 64 }, //Kunnov
+  { name: "HAWFA", px: 0, py: 0, size: 64 }, //Haw Fuh
+  { name: "SAWPE", px: 0, py: 0, size: 64 }, //Saw pee
+  { name: "BEANS", px: 0, py: 0, size: 64 }, //Beans
+  { name: "LOGAN", px: 0, py: 0, size: 64 }, //Logan
 
   // Larnaca
-  { name: "RENTS", px: 10212, py: 6042, size: 64 }, //Rents
-  { name: "GRASS", px: 10345, py: 6210, size: 64 }, //Grass
-  { name: "AQWRT", px: 10492, py: 6395, size: 64 }, //Aquirt
-  { name: "FORIA", px: 10650, py: 6548, size: 64 }, //Forya
-  { name: "FORCE", px: 10822, py: 6705, size: 64 }, //Force
-  { name: "MASEV", px: 11004, py: 6832, size: 64 }, //Masiv
-  { name: "ALTRS", px: 11180, py: 6972, size: 64 }, //Alters
-  { name: "MUONE", px: 11342, py: 7112, size: 64 }, //Mew Own
-  { name: "JAZZR", px: 11482, py: 7268, size: 64 }, //Jazzer
-  { name: "NUBER", px: 11630, py: 7410, size: 64 }, //New ber
-  { name: "BOBUX", px: 11755, py: 7554, size: 64 }, //Bobux
-  { name: "DEBUG", px: 11884, py: 7692, size: 64 }, //Debug
-  { name: "JACKI", px: 12045, py: 7820, size: 64 }, //Jacky
+  { name: "RENTS", px: 0, py: 0, size: 64 }, //Rents
+  { name: "GRASS", px: 0, py: 0, size: 64 }, //Grass
+  { name: "AQWRT", px: 0, py: 0, size: 64 }, //Aquirt
+  { name: "FORIA", px: 0, py: 0, size: 64 }, //Forya
+  { name: "FORCE", px: 0, py: 0, size: 64 }, //Force
+  { name: "MASEV", px: 0, py: 0, size: 64 }, //Masiv
+  { name: "ALTRS", px: 0, py: 0, size: 64 }, //Alters
+  { name: "MUONE", px: 0, py: 0, size: 64 }, //Mew Own
+  { name: "JAZZR", px: 0, py: 0, size: 64 }, //Jazzer
+  { name: "NUBER", px: 0, py: 0, size: 64 }, //New ber
+  { name: "BOBUX", px: 0, py: 0, size: 64 }, //Bobux
+  { name: "DEBUG", px: 0, py: 0, size: 64 }, //Debug
+  { name: "JACKI", px: 0, py: 0, size: 64 }, //Jacky
 
   // Skopelos
-  { name: "CAWZE", px: 12202, py: 7958, size: 64 }, //Cawz ey
-  { name: "ANYMS", px: 12345, py: 8092, size: 64 }, //Ay nims
+  { name: "CAWZE", px: 0, py: 0, size: 64 }, //Cawz ey
+  { name: "ANYMS", px: 0, py: 0, size: 64 }, //Ay nims
 
   // Izolirani
-  { name: "CAMEL", px: 12501, py: 8220, size: 64 }, //Camel
-  { name: "CYRIL", px: 12632, py: 8355, size: 64 }, //S eye ril, sir il
-  { name: "DUNKS", px: 12794, py: 8490, size: 64 }, //Dunks
-  { name: "DOGGO", px: 12922, py: 8620, size: 64 }, //Dog Oh
-  { name: "JUSTY", px: 13071, py: 8742, size: 64 }, //Justy
-  { name: "CHAIN", px: 13215, py: 8860, size: 64 }, //Chain
-  { name: "BILLO", px: 13342, py: 8992, size: 64 }, //Bill oh
-  { name: "ABSRS", px: 13494, py: 9121, size: 64 }, //Abserse
-  { name: "MORRD", px: 13655, py: 9240, size: 64 }, //Mord
-  { name: "LLIME", px: 13802, py: 9360, size: 64 }, //Lime
-  { name: "UDMUG", px: 13940, py: 9492, size: 64 }, //Uhd mug
-  { name: "ROSMO", px: 14091, py: 9625, size: 64 }, //Ros moh
+  { name: "CAMEL", px: 0, py: 0, size: 64 }, //Camel
+  { name: "CYRIL", px: 0, py: 0, size: 64 }, //S eye ril, sir il
+  { name: "DUNKS", px: 0, py: 0, size: 64 }, //Dunks
+  { name: "DOGGO", px: 0, py: 0, size: 64 }, //Dog Oh
+  { name: "JUSTY", px: 0, py: 0, size: 64 }, //Justy
+  { name: "CHAIN", px: 0, py: 0, size: 64 }, //Chain
+  { name: "BILLO", px: 0, py: 0, size: 64 }, //Bill oh
+  { name: "ABSRS", px: 0, py: 0, size: 64 }, //Abserse
+  { name: "MORRD", px: 0, py: 0, size: 64 }, //Mord
+  { name: "LLIME", px: 0, py: 0, size: 64 }, //Lime
+  { name: "UDMUG", px: 0, py: 0, size: 64 }, //Uhd mug
+  { name: "ROSMO", px: 0, py: 0, size: 64 }, //Ros moh
 
-    // Saint Barts (continued)
-  { name: "PROBE", px: 14800, py: 10315, size: 64 }, //Probe
-  { name: "DINER", px: 14942, py: 10460, size: 64 }, //Diner
-  { name: "INDEX", px: 15105, py: 10610, size: 64 }, //Index
-  { name: "GAVIN", px: 15242, py: 10762, size: 64 }, //Gavin
-  { name: "SILVA", px: 15405, py: 10895, size: 64 }, //Silva
-  { name: "OCEEN", px: 15562, py: 11048, size: 64 }, //Oceen?
+    // Saint Barts
+  { name: "PROBE", px: 0, py: 0, size: 64 }, //Probe
+  { name: "DINER", px: 0, py: 0, size: 64 }, //Diner
+  { name: "INDEX", px: 0, py: 0, size: 64 }, //Index
+  { name: "GAVIN", px: 0, py: 0, size: 64 }, //Gavin
+  { name: "SILVA", px: 0, py: 0, size: 64 }, //Silva
+  { name: "OCEEN", px: 0, py: 0, size: 64 }, //Oceen?
 
   // Perth
-  { name: "CRAZY", px: 15710, py: 11192, size: 64 }, //crazy
-  { name: "WOTAN", px: 15845, py: 11342, size: 64 }, //woah ton
-  { name: "WAGON", px: 16002, py: 11485, size: 64 }, //wagon
-  { name: "WELLS", px: 16140, py: 11642, size: 64 }, //wells
-  { name: "SQUID", px: 16282, py: 11788, size: 64 }, //squid
-  { name: "KELLA", px: 16432, py: 11945, size: 64 }, //kell uh
-  { name: "ZESTA", px: 16575, py: 12095, size: 64 }, //zest uh
-  { name: "NOONU", px: 16728, py: 12242, size: 64 }, //Newnew
-  { name: "SISTA", px: 16880, py: 12388, size: 64 }, //Sistuh
-  { name: "TALIS", px: 17015, py: 12530, size: 64 }, //Talis
-  { name: "STRAX", px: 17164, py: 12682, size: 64 }, //Strax
-  { name: "TINDR", px: 17310, py: 12830, size: 64 }, //Tinder
+  { name: "CRAZY", px: 0, py: 0, size: 64 }, //crazy
+  { name: "WOTAN", px: 0, py: 0, size: 64 }, //woah ton
+  { name: "WAGON", px: 0, py: 0, size: 64 }, //wagon
+  { name: "WELLS", px: 0, py: 0, size: 64 }, //wells
+  { name: "SQUID", px: 0, py: 0, size: 64 }, //squid
+  { name: "KELLA", px: 0, py: 0, size: 64 }, //kell uh
+  { name: "ZESTA", px: 0, py: 0, size: 64 }, //zest uh
+  { name: "NOONU", px: 0, py: 0, size: 64 }, //Newnew
+  { name: "SISTA", px: 0, py: 0, size: 64 }, //Sistuh
+  { name: "TALIS", px: 0, py: 0, size: 64 }, //Talis
+  { name: "STRAX", px: 0, py: 0, size: 64 }, //Strax
+  { name: "TINDR", px: 0, py: 0, size: 64 }, //Tinder
 
   // Tokyo
-  { name: "SHELL", px: 17462, py: 12980, size: 64 }, //Shell
-  { name: "NIKON", px: 17602, py: 13122, size: 64 }, //neekon
-  { name: "CHILY", px: 17745, py: 13265, size: 64 }, //chilly
-  { name: "SHIBA", px: 17892, py: 13405, size: 64 }, //shee buh
-  { name: "LETSE", px: 18031, py: 13552, size: 64 }, //lets see
-  { name: "HONDA", px: 18175, py: 13702, size: 64 }, //Honda
-  { name: "ASTRO", px: 18320, py: 13842, size: 64 }, //Astro
-  { name: "GULEG", px: 18480, py: 13988, size: 64 }, //goo leg
-  { name: "PIPER", px: 18615, py: 14140, size: 64 }, //Piper
-  { name: "TUDEP", px: 18760, py: 14285, size: 64 }, //too dep
-  { name: "ALLRY", px: 18902, py: 14430, size: 64 }, //all rey
-  { name: "ONDER", px: 19052, py: 14585, size: 64 }, //Onder
-  { name: "KNIFE", px: 19205, py: 14732, size: 64 }, //Knife
+  { name: "SHELL", px: 0, py: 0, size: 64 }, //Shell
+  { name: "NIKON", px: 0, py: 0, size: 64 }, //neekon
+  { name: "CHILY", px: 0, py: 0, size: 64 }, //chilly
+  { name: "SHIBA", px: 0, py: 0, size: 64 }, //shee buh
+  { name: "LETSE", px: 0, py: 0, size: 64 }, //lets see
+  { name: "HONDA", px: 0, py: 0, size: 64 }, //Honda
+  { name: "ASTRO", px: 5192.92, py: 2293.68, size: 64 }, //Astro
+  { name: "GULEG", px: 0, py: 0, size: 64 }, //goo leg
+  { name: "PIPER", px: 0, py: 0, size: 64 }, //Piper
+  { name: "TUDEP", px: 0, py: 0, size: 64 }, //too dep
+  { name: "ALLRY", px: 0, py: 0, size: 64 }, //all rey
+  { name: "ONDER", px: 0, py: 0, size: 64 }, //Onder
+  { name: "KNIFE", px: 0, py: 0, size: 64 }, //Knife
+
+  //SMALL WAYPOINTS
 ];
 
 function renderWaypoints(list) {
   list.forEach(({ name, px, py, size }) => {
-    const [lat, lng] = apiPositionToLatLng(px, py);
+    const [lat, lng] = waypointPositionToLatLng(px, py);
     const icon = L.divIcon({
       className: "waypoint-icon",
       html: `
@@ -514,3 +531,41 @@ document.querySelectorAll('.section-toggle').forEach(button => {
       button.textContent.replace('▼', '▲');
   });
 });
+
+// SID/STAR definitions
+const SIDS_STARS = [
+  {
+    name: "GRINDAVIK1A",
+    type: "SID",
+    airport: "GRINDAVIK",
+    waypoints: ["BULLY", "FROOT", "EURAD", "BOBOS", "THENR"]
+  },
+  {
+    name: "ROCKFORD2B",
+    type: "STAR",
+    airport: "ROCKFORD",
+    waypoints: ["ENDER", "SUNST", "BUCFA", "KENED", "SETHR"]
+  },
+  // Add more SIDs/STARs here...
+];
+
+// Get waypoint objects for a SID/STAR by name
+function getSidStarWaypoints(sidStarName) {
+  const sidStar = SIDS_STARS.find(s => s.name === sidStarName);
+  if (!sidStar) return [];
+  return sidStar.waypoints.map(wpName => Waypoints.find(wp => wp.name === wpName)).filter(Boolean);
+}
+
+// Render SID/STAR route on map
+function renderSidStarRoute(sidStarName, options = {}) {
+  const waypoints = getSidStarWaypoints(sidStarName);
+  if (waypoints.length < 2) return null;
+  const latLngs = waypoints.map(wp => apiPositionToLatLng(wp.px, wp.py));
+  const polyline = L.polyline(latLngs, {
+    color: options.color || 'orange',
+    weight: options.weight || 3,
+    dashArray: options.dashArray || '8,8',
+    opacity: options.opacity || 0.8
+  }).addTo(map);
+  return polyline;
+}
