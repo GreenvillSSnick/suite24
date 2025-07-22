@@ -561,17 +561,20 @@ document.querySelectorAll('.section-toggle').forEach(button => {
 
 // SID/STAR definitions
 const SIDS_STARS = [
+  //sids
   {
-    name: "GRINDAVIK1A",
+    name: "",
     type: "SID",
-    airport: "GRINDAVIK",
-    waypoints: ["BULLY", "FROOT", "EURAD", "BOBOS", "THENR"]
+    airport: "", //Icao
+    waypoints: ["", "", "", "", ""]
   },
+
+  //stars
   {
-    name: "ROCKFORD2B",
+    name: "",
     type: "STAR",
-    airport: "ROCKFORD",
-    waypoints: ["ENDER", "SUNST", "BUCFA", "KENED", "SETHR"]
+    airport: "",
+    waypoints: ["", "", "", "", ""]
   },
   // Add more SIDs/STARs here...
 ];
