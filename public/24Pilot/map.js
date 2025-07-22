@@ -262,57 +262,72 @@ const Waypoints = [
   // Waypoints relative to the top left of the map image
 
   // Top left corner
-  { name: "TOPLEFT", px: -14453*2, py: -13800*2, size: 64 }, // top left
+  // { name: "TOPLEFT", px: -14453*2, py: -13800*2, size: 64 }, // top left
 
   // Center of map
-  { name: "CENTER", px: imageWidth / 2, py: imageHeight / 2, size: 64 }, // center
+  // { name: "CENTER", px: imageWidth / 2, py: imageHeight / 2, size: 64 }, // center
 
   // Bottom right corner
-  { name: "BOTTOMRIGHT", px: imageWidth, py: imageHeight, size: 64 }, // bottom right
+  // { name: "BOTTOMRIGHT", px: imageWidth, py: imageHeight, size: 64 }, // bottom right
 
   // Example: 100px right, 200px down from top left
-  { name: "EXAMPLE1", px: 100, py: 200, size: 64 },
+  // { name: "EXAMPLE1", px: 100, py: 200, size: 64 },
 
   // Grindavik
-  { name: "BULLY", px: 0, py: 0, size: 64 }, //bully
-  { name: "FROOT", px: 0, py: 0, size: 64 }, //fruit
-  { name: "EURAD", px: 0, py: 0, size: 64 }, //Yurad
-  { name: "BOBOS", px: 0, py: 0, size: 64 }, //bowbows?
-  { name: "THENR", px: 0, py: 0, size: 64 }, //thenner
-  { name: "BLANK", px: 0, py: 0, size: 64 }, //blank
-  { name: "ACRES", px: 0, py: 0, size: 64 }, //acres
-  { name: "YOUTH", px: 0, py: 0, size: 64 }, //youth
-  { name: "UWAIS", px: 0, py: 0, size: 64 }, //Eww Wais
-  { name: "FRANK", px: 0, py: 0, size: 64 }, //Frank
-  { name: "CELAR", px: 0, py: 0, size: 64 }, //Sellar
-  { name: "EZYDB", px: 0, py: 0, size: 64 }, //EasyDub
-  { name: "THACC", px: 0, py: 0, size: 64 }, //Thack
-  { name: "SHREK", px: 0, py: 0, size: 64 }, //Shrek
-  { name: "SPACE", px: 0, py: 0, size: 64 }, //Space
+  { name: "BULLY", px: 2456.09, py: 2417.97, size: 64 }, //bully
+  { name: "FROOT", px: 1503.71, py: 3544.37, size: 64 }, //fruit
+  { name: "EURAD", px: 3402.95, py: 3875.30, size: 64 }, //Yurad
+  { name: "BOBOS", px: 543.59, py: 4476.87, size: 64 }, //bowbows?
+  { name: "THENR", px: 1496.88, py: 4987.5, size: 64 }, //thenner
+  { name: "BLANK", px: 3790.63, py: 4756.25, size: 64 }, //blank
+  { name: "ACRES", px: -146.88, py: 5275, size: 64 }, //acres
+  { name: "YOUTH", px: 2587.5, py: 5571.88, size: 64 }, //youth
+  { name: "UWAIS", px: -893.75, py: 6028.13, size: 64 }, //Eww Wais
+  { name: "FRANK", px: -815.63, py: 7182.81, size: 64 }, //Frank
+  { name: "CELAR", px: 1856.16, py: 7658.85, size: 64 }, //Sellar
+  { name: "EZYDB", px: 3848.21, py: 6238.01, size: 64 }, //EasyDub
+  { name: "THACC", px: -826.43, py: 8455.45, size: 64 }, //Thack
+  { name: "SHREK", px: 513.28, py: 8585.94, size: 64 }, //Shrek
+  { name: "SPACE", px: 1915.82, py: 8843.25, size: 64 }, //Space
 
   // Sauthemptona
-  { name: "HACKE", px: 0, py: 0, size: 64 }, //Hack
-  { name: "HECKS", px: 0, py: 0, size: 64 }, //Hecks
-  { name: "GEORG", px: 0, py: 0, size: 64 }, //George
-  { name: "SEEKS", px: 0, py: 0, size: 64 }, //Seeks
-  { name: "PACKT", px: 0, py: 0, size: 64 }, //Packet
-  { name: "ALDER", px: 0, py: 0, size: 64 }, //Alder
-  { name: "STACK", px: 0, py: 0, size: 64 }, //Stack
-  { name: "WASTE", px: 0, py: 0, size: 64 }, //Waste
-  { name: "HOGGS", px: 0, py: 0, size: 64 }, //Hoggs
-  { name: "ROBUX", px: 0, py: 0, size: 64 }, //Robux
+  { name: "HACKE", px: -642.19, py: 9934.38, size: 64 }, //Hackee
+  { name: "HECKS", px: -950.78, py: 11425.78, size: 64 }, //Hecks
+  { name: "GEORG", px: 610.94, py: 10313.28, size: 64 }, //George
+  { name: "SEEKS", px: 1923.44, py: 10763.28, size: 64 }, //Seeks
+  { name: "PACKT", px: 117.19, py: 11721.88, size: 64 }, //Packet
+  { name: "ALDER", px: 3212.92, py: 11899.28, size: 64 }, //Alder
+  { name: "STACK", px: 1506.25, py: 12237.5, size: 64 }, //Stack
+  { name: "WASTE", px: 23.44, py: 12975, size: 64 }, //Waste
+  { name: "HOGGS", px: 3000.78, py: 12844.48, size: 64 }, //Hoggs
+  { name: "ROBUX", px: 2358.86, py: 14075.84, size: 64 }, //Robux
 
   // Rockford
-  { name: "ENDER", px: 0, py: 0, size: 64 }, //Ender
-  { name: "SUNST", px: 0, py: 0, size: 64 }, //Sunset
-  { name: "BUCFA", px: 0, py: 0, size: 64 }, //Buckfuh
-  { name: "KENED", px: 0, py: 0, size: 64 }, //Keneddy? kened?
-  { name: "SETHR", px: 0, py: 0, size: 64 }, //Sether
-  { name: "KUNAV", px: 0, py: 0, size: 64 }, //Kunnov
-  { name: "HAWFA", px: 0, py: 0, size: 64 }, //Haw Fuh
-  { name: "SAWPE", px: 0, py: 0, size: 64 }, //Saw pee
-  { name: "BEANS", px: 0, py: 0, size: 64 }, //Beans
-  { name: "LOGAN", px: 0, py: 0, size: 64 }, //Logan
+  { name: "ENDER", px: 4415, py: 7000.36, size: 64 }, //Ender
+  { name: "SUNST", px: 3621.71, py: 7665.48, size: 64 }, //Sunset
+  { name: "BUCFA", px: 4481.29, py: 8200.23, size: 64 }, //Buckfuh
+  { name: "KENED", px: 5683.37, py: 7442.3, size: 64 }, //Keneddy? kened?
+  { name: "SETHR", px: 7901.92, py: 8038.92, size: 64 }, //Sether
+  { name: "KUNAV", px: 5685.58, py: 8315.13, size: 64 }, //Kunnov
+  { name: "HAWFA", px: 6220.33, py: 8606.82, size: 64 }, //Haw Fuh
+  { name: "SAWPE", px: 3277.34, py: 8505.47, size: 64 }, //Saw pee
+  { name: "BEANS", px: 3355.44, py: 9736.53, size: 64 }, //Beans
+  { name: "LOGAN", px: 4395.31, py: 9970.31, size: 64 }, //Logan
+  { name: "EXMOR", px: 4577.41, py: 10896.63, size: 64 },
+  { name: "QUEEN", px: 7062.23, py: 9241, size: 64 },
+  { name: "MOGTA", px: 5718.73, py: 10398.89, size: 64 },
+  { name: "LAVNO", px: 7721.88, py: 9537.1, size: 64 },
+  { name: "ICTAM", px: 5409.37, py: 8757.08, size: 64 }, //ichtham
+  { name: "ATPEV", px: 8186.97, py: 9353.7, size: 64 },
+  { name: "JAMSI", px: 8702.94, py: 10251.94, size: 64 },
+  { name: "GODLU", px: 7897.5, py: 10994.41, size: 64 },
+  { name: "LAZER", px: 8599.08, py: 11282.77, size: 64 },
+  { name: "PEPUL", px: 6128.63, py: 11217.59, size: 64 },
+  { name: "EMJAY", px: 5184.38, py: 12296.88, size: 64 },
+  { name: "ODOKU", px: 6843.75, py: 12306.25, size: 64 },
+  { name: "REAPR", px: 7192.6, py: 13494.69, size: 64 },
+  { name: "TRELN", px: 5875.62, py: 13722.29, size: 64 },
+  { name: "DEATH", px: 4556.42, py: 14033.86, size: 64 },
 
   // Larnaca
   { name: "RENTS", px: 0, py: 0, size: 64 }, //Rents
@@ -330,8 +345,8 @@ const Waypoints = [
   { name: "JACKI", px: 0, py: 0, size: 64 }, //Jacky
 
   // Skopelos
-  { name: "CAWZE", px: 0, py: 0, size: 64 }, //Cawz ey
-  { name: "ANYMS", px: 0, py: 0, size: 64 }, //Ay nims
+  { name: "CAWZE", px: 10343.65, py: 8030.08, size: 64 }, //Cawz ey
+  { name: "ANYMS", px: 9669.69, py: 9644.53, size: 64 }, //Ay nims
 
   // Izolirani
   { name: "CAMEL", px: 0, py: 0, size: 64 }, //Camel

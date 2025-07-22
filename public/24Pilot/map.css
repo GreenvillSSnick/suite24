@@ -358,3 +358,7 @@ html, body {
 .waypoint-icon {
   z-index: 1000 !important;
 }
+
+.leaflet-image-layer {
+  image-rendering: pixelated;
+}
