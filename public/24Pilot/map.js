@@ -39,6 +39,12 @@ function apiPositionToLatLng(apiX, apiY) {
   return [mapY, mapX];
 }
 
+// For waypoints: px/py are top-left-relative pixel coordinates
+function waypointPositionToLatLng(px, py) {
+  // Flip py so 0 is top, imageHeight is bottom
+  return [imageHeight - py, px];
+}
+
 let cachedFlightPlans = {};
 const aircraftMarkers = new Map();
 const aircraftTrailLayers = new Map();
@@ -524,11 +530,17 @@ map.on("mousemove", (e) => {
 
 document.querySelectorAll('.section-toggle').forEach(button => {
   button.addEventListener('click', () => {
+    const section = button.parentElement;
     const content = button.nextElementSibling;
-    content.style.display = content.style.display === 'block' ? 'none' : 'block';
-    button.textContent = button.textContent.includes('▲') ?
-      button.textContent.replace('▲', '▼') :
-      button.textContent.replace('▼', '▲');
+    const isOpen = section.classList.contains('active');
+    document.querySelectorAll('.section').forEach(s => {
+      s.classList.remove('active');
+      s.querySelector('.section-toggle').classList.remove('open');
+    });
+    if (!isOpen) {
+      section.classList.add('active');
+      button.classList.add('open');
+    }
   });
 });
 
