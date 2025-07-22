@@ -257,36 +257,6 @@ function updateUTCClock() {
 
 setInterval(updateUTCClock, 1000);
 
-// --- Waypoint Toggle ---
-let waypointsEnabled = true;
-let waypointMarkers = [];
-
-function renderWaypoints(list) {
-  // Remove existing markers
-  waypointMarkers.forEach(marker => map.removeLayer(marker));
-  waypointMarkers = [];
-  if (!waypointsEnabled) return;
-  list.forEach(({ name, px, py, size }) => {
-    const [lat, lng] = waypointPositionToLatLng(px, py);
-    const icon = L.divIcon({
-      className: "waypoint-icon",
-      html: `
-        <div class="waypoint-wrapper" style="width:${size}px; height:${size}px;">
-          <div class="waypoint-label">${name}</div>
-          <img src="/unified/icons/map/fix.RNAVFlyOver.png" style="width:${size}px; height:${size}px;">
-        </div>
-      `,
-      iconSize: [size, size],
-      iconAnchor: [size / 2, size / 2]
-    });
-    const marker = L.marker([lat, lng], { icon }).addTo(map);
-    waypointMarkers.push(marker);
-  });
-}
-
-// Initial render
-renderWaypoints(Waypoints);
-
 // Listen for toggle from settings
 document.getElementById("toggle-waypoints").addEventListener("change", (e) => {
   waypointsEnabled = e.target.checked;
@@ -398,7 +368,7 @@ const Waypoints = [
   { name: "UDMUG", px: 0, py: 0, size: 64 }, //Uhd mug
   { name: "ROSMO", px: 0, py: 0, size: 64 }, //Ros moh
 
-    // Saint Barts
+  // Saint Barts
   { name: "PROBE", px: 0, py: 0, size: 64 }, //Probe
   { name: "DINER", px: 0, py: 0, size: 64 }, //Diner
   { name: "INDEX", px: 0, py: 0, size: 64 }, //Index
@@ -438,6 +408,9 @@ const Waypoints = [
   //SMALL WAYPOINTS
 ];
 
+// Initial render (now Waypoints is defined)
+renderWaypoints(Waypoints);
+
 // --- SID/STAR definitions with altitudes/speeds ---
 const SIDS_STARS = [
   {
@@ -466,6 +439,28 @@ const SIDS_STARS = [
   },
   // ...add more SIDs/STARs here...
 ];
+
+// --- Waypoint Toggle ---
+let waypointsEnabled = true;
+let waypointMarkers = [];
+
+function renderWaypoints(list) {
+  list.forEach(({ name, px, py, size }) => {
+    const [lat, lng] = waypointPositionToLatLng(px, py);
+    const icon = L.divIcon({
+      className: "waypoint-icon",
+      html: `
+        <div class="waypoint-wrapper" style="width:${size}px; height:${size}px;">
+          <div class="waypoint-label">${name}</div>
+          <img src="/unified/icons/map/fix.RNAVFlyOver.png" style="width:${size}px; height:${size}px;">
+        </div>
+      `,
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2]
+    });
+    L.marker([lat, lng], { icon }).addTo(map);
+  });
+}
 
 // Get waypoint objects for a SID/STAR by name
 function getSidStarWaypoints(sidStarName) {
@@ -507,24 +502,6 @@ function renderSidStarRoute(sidStarName, options = {}) {
       .addTo(map);
   }
   return polyline;
-}
-
-function renderWaypoints(list) {
-  list.forEach(({ name, px, py, size }) => {
-    const [lat, lng] = waypointPositionToLatLng(px, py);
-    const icon = L.divIcon({
-      className: "waypoint-icon",
-      html: `
-        <div class="waypoint-wrapper" style="width:${size}px; height:${size}px;">
-          <div class="waypoint-label">${name}</div>
-          <img src="/unified/icons/map/fix.RNAVFlyOver.png" style="width:${size}px; height:${size}px;">
-        </div>
-      `,
-      iconSize: [size, size],
-      iconAnchor: [size / 2, size / 2]
-    });
-    L.marker([lat, lng], { icon }).addTo(map);
-  });
 }
 
 renderWaypoints(Waypoints);
