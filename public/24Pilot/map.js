@@ -1,3 +1,5 @@
+//image
+
 const imageWidth = 14453;
 const imageHeight = 13800;
 const imageBounds = [[0, 0], [imageHeight, imageWidth]];
@@ -66,6 +68,7 @@ document.getElementById("close-aircraft-sidebar").addEventListener("click", () =
 
 document.querySelector(".settings-btn").addEventListener("click", () => {
   document.getElementById("settings-sidebar").classList.remove("hidden");
+  hideWaypoints();
 });
 
 document.getElementById("close-settings-sidebar").addEventListener("click", () => {
@@ -257,12 +260,6 @@ function updateUTCClock() {
 
 setInterval(updateUTCClock, 1000);
 
-// Listen for toggle from settings
-document.getElementById("toggle-waypoints").addEventListener("change", (e) => {
-  waypointsEnabled = e.target.checked;
-  renderWaypoints(Waypoints);
-});
-
 const Waypoints = [
 
   // Waypoints relative to the top left of the map image
@@ -444,6 +441,11 @@ const SIDS_STARS = [
 let waypointsEnabled = true;
 let waypointMarkers = [];
 
+function hideWaypoints() {
+  waypointMarkers.forEach(marker => map.removeLayer(marker));
+  waypointMarkers = [];
+}
+
 function renderWaypoints(list) {
   list.forEach(({ name, px, py, size }) => {
     const [lat, lng] = waypointPositionToLatLng(px, py);
@@ -461,6 +463,16 @@ function renderWaypoints(list) {
     L.marker([lat, lng], { icon }).addTo(map);
   });
 }
+
+// Listen for toggle from settings
+document.getElementById("toggle-waypoints").addEventListener("change", (e) => {
+  waypointsEnabled = e.target.checked;
+  if (waypointsEnabled) {
+    renderWaypoints(Waypoints);
+  } else {
+    hideWaypoints();
+  }
+});
 
 // Get waypoint objects for a SID/STAR by name
 function getSidStarWaypoints(sidStarName) {
