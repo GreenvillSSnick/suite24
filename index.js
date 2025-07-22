@@ -156,8 +156,10 @@ app.get('/api/acft-data/event', (req, res) => {
 });
 
 app.get('/api/flight-plans', (req, res) => {
-  const allPlans = Object.fromEntries(flightPlans.entries());
-  res.json(allPlans);
+  const wrappedPlans = Object.fromEntries(
+    Array.from(flightPlans.entries()).map(([key, value]) => [key, { flightPlan: value }])
+  );
+  res.json(wrappedPlans);
 });
 
 app.get('/api/flight-plans/event', (req, res) => {
@@ -165,6 +167,23 @@ app.get('/api/flight-plans/event', (req, res) => {
   res.json(allPlans);
 });
 
+app.get('/api/acft-data', (req, res) => {
+  res.json({ controllers });
+
+  // log stuff
+  const logEntry = {
+    timestamp: new Date().toISOString(),
+    method: req.method,
+    url: req.originalUrl,
+    params: req.params,
+    query: req.query,
+    headers: req.headers,
+  };
+
+  fs.appendFile('api_requests.txt', JSON.stringify(logEntry) + '\n', (err) => {
+    if (err) console.error(err);
+  });
+});
 // get = read
 app.get('/api/paths/:callsign', (req, res) => {
   const callsign = req.params.callsign;
@@ -259,4 +278,3 @@ app.delete('/api/paths/:callsign', (req, res) => {
     if (err) console.error(err);
   });
 });
-
