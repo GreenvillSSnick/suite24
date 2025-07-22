@@ -252,6 +252,9 @@ function updateUTCClock() {
 setInterval(updateUTCClock, 1000);
 
 const Waypoints = [
+
+  //MAIN WAYPOINTS
+
   // Grindavik
   { name: "BULLY", px: 3240, py: 1520, size: 64 }, //bully
   { name: "FROOT", px: 3785, py: 1490, size: 64 }, //fruit
@@ -326,7 +329,7 @@ const Waypoints = [
   { name: "UDMUG", px: 13940, py: 9492, size: 64 }, //Uhd mug
   { name: "ROSMO", px: 14091, py: 9625, size: 64 }, //Ros moh
 
-    // Saint Barts (continued)
+    // Saint Barts
   { name: "PROBE", px: 14800, py: 10315, size: 64 }, //Probe
   { name: "DINER", px: 14942, py: 10460, size: 64 }, //Diner
   { name: "INDEX", px: 15105, py: 10610, size: 64 }, //Index
@@ -362,6 +365,8 @@ const Waypoints = [
   { name: "ALLRY", px: 18902, py: 14430, size: 64 }, //all rey
   { name: "ONDER", px: 19052, py: 14585, size: 64 }, //Onder
   { name: "KNIFE", px: 19205, py: 14732, size: 64 }, //Knife
+
+  //SMALL WAYPOINTS
 ];
 
 function renderWaypoints(list) {
@@ -507,10 +512,54 @@ map.on("mousemove", (e) => {
 
 document.querySelectorAll('.section-toggle').forEach(button => {
   button.addEventListener('click', () => {
+    const section = button.parentElement;
     const content = button.nextElementSibling;
-    content.style.display = content.style.display === 'block' ? 'none' : 'block';
-    button.textContent = button.textContent.includes('▲') ?
-      button.textContent.replace('▲', '▼') :
-      button.textContent.replace('▼', '▲');
+    const isOpen = section.classList.contains('active');
+    document.querySelectorAll('.section').forEach(s => {
+      s.classList.remove('active');
+      s.querySelector('.section-toggle').classList.remove('open');
+    });
+    if (!isOpen) {
+      section.classList.add('active');
+      button.classList.add('open');
+    }
   });
 });
+
+// SID/STAR definitions
+const SIDS_STARS = [
+  {
+    name: "GRINDAVIK1A",
+    type: "SID",
+    airport: "GRINDAVIK",
+    waypoints: ["BULLY", "FROOT", "EURAD", "BOBOS", "THENR"]
+  },
+  {
+    name: "ROCKFORD2B",
+    type: "STAR",
+    airport: "ROCKFORD",
+    waypoints: ["ENDER", "SUNST", "BUCFA", "KENED", "SETHR"]
+  },
+  // Add more SIDs/STARs here...
+];
+
+// Get waypoint objects for a SID/STAR by name
+function getSidStarWaypoints(sidStarName) {
+  const sidStar = SIDS_STARS.find(s => s.name === sidStarName);
+  if (!sidStar) return [];
+  return sidStar.waypoints.map(wpName => Waypoints.find(wp => wp.name === wpName)).filter(Boolean);
+}
+
+// Render SID/STAR route on map
+function renderSidStarRoute(sidStarName, options = {}) {
+  const waypoints = getSidStarWaypoints(sidStarName);
+  if (waypoints.length < 2) return null;
+  const latLngs = waypoints.map(wp => apiPositionToLatLng(wp.px, wp.py));
+  const polyline = L.polyline(latLngs, {
+    color: options.color || 'orange',
+    weight: options.weight || 3,
+    dashArray: options.dashArray || '8,8',
+    opacity: options.opacity || 0.8
+  }).addTo(map);
+  return polyline;
+}
