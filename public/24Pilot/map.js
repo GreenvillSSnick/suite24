@@ -257,6 +257,42 @@ function updateUTCClock() {
 
 setInterval(updateUTCClock, 1000);
 
+// --- Waypoint Toggle ---
+let waypointsEnabled = true;
+let waypointMarkers = [];
+
+function renderWaypoints(list) {
+  // Remove existing markers
+  waypointMarkers.forEach(marker => map.removeLayer(marker));
+  waypointMarkers = [];
+  if (!waypointsEnabled) return;
+  list.forEach(({ name, px, py, size }) => {
+    const [lat, lng] = waypointPositionToLatLng(px, py);
+    const icon = L.divIcon({
+      className: "waypoint-icon",
+      html: `
+        <div class="waypoint-wrapper" style="width:${size}px; height:${size}px;">
+          <div class="waypoint-label">${name}</div>
+          <img src="/unified/icons/map/fix.RNAVFlyOver.png" style="width:${size}px; height:${size}px;">
+        </div>
+      `,
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2]
+    });
+    const marker = L.marker([lat, lng], { icon }).addTo(map);
+    waypointMarkers.push(marker);
+  });
+}
+
+// Initial render
+renderWaypoints(Waypoints);
+
+// Listen for toggle from settings
+document.getElementById("toggle-waypoints").addEventListener("change", (e) => {
+  waypointsEnabled = e.target.checked;
+  renderWaypoints(Waypoints);
+});
+
 const Waypoints = [
 
   // Waypoints relative to the top left of the map image
@@ -401,6 +437,77 @@ const Waypoints = [
 
   //SMALL WAYPOINTS
 ];
+
+// --- SID/STAR definitions with altitudes/speeds ---
+const SIDS_STARS = [
+  {
+    name: "GRINDAVIK1A",
+    type: "SID",
+    airport: "GRINDAVIK",
+    waypoints: [
+      { name: "BULLY", altitude: 2000, speed: 220 },
+      { name: "FROOT", altitude: 3000, speed: 230 },
+      { name: "EURAD", altitude: 4000, speed: 240 },
+      { name: "BOBOS", altitude: 5000, speed: 250 },
+      { name: "THENR", altitude: 6000, speed: 260 }
+    ]
+  },
+  {
+    name: "ROCKFORD2B",
+    type: "STAR",
+    airport: "ROCKFORD",
+    waypoints: [
+      { name: "ENDER", altitude: 7000, speed: 210 },
+      { name: "SUNST", altitude: 6000, speed: 200 },
+      { name: "BUCFA", altitude: 5000, speed: 190 },
+      { name: "KENED", altitude: 4000, speed: 180 },
+      { name: "SETHR", altitude: 3000, speed: 170 }
+    ]
+  },
+  // ...add more SIDs/STARs here...
+];
+
+// Get waypoint objects for a SID/STAR by name
+function getSidStarWaypoints(sidStarName) {
+  const sidStar = SIDS_STARS.find(s => s.name === sidStarName);
+  if (!sidStar) return [];
+  // Merge waypoint info with coordinates from Waypoints array
+  return sidStar.waypoints.map(wp => {
+    const base = Waypoints.find(w => w.name === wp.name);
+    return base ? { ...base, ...wp } : null;
+  }).filter(Boolean);
+}
+
+// Render SID/STAR route on map, with alt/speed popups
+function renderSidStarRoute(sidStarName, options = {}) {
+  const waypoints = getSidStarWaypoints(sidStarName);
+  if (waypoints.length < 2) return null;
+  const latLngs = waypoints.map(wp => waypointPositionToLatLng(wp.px, wp.py));
+  const polyline = L.polyline(latLngs, {
+    color: options.color || 'orange',
+    weight: options.weight || 3,
+    dashArray: options.dashArray || '8,8',
+    opacity: options.opacity || 0.8
+  }).addTo(map);
+
+  // Add popups/labels for each leg
+  for (let i = 0; i < waypoints.length - 1; i++) {
+    const wpA = waypoints[i];
+    const wpB = waypoints[i + 1];
+    // Midpoint for label
+    const midLat = (waypointPositionToLatLng(wpA.px, wpA.py)[0] + waypointPositionToLatLng(wpB.px, wpB.py)[0]) / 2;
+    const midLng = (waypointPositionToLatLng(wpA.px, wpA.py)[1] + waypointPositionToLatLng(wpB.px, wpB.py)[1]) / 2;
+    const label = L.popup({
+      closeButton: false,
+      autoClose: false,
+      className: "sidstar-leg-popup"
+    })
+      .setLatLng([midLat, midLng])
+      .setContent(`Alt: ${wpB.altitude} ft<br>Spd: ${wpB.speed} kt`)
+      .addTo(map);
+  }
+  return polyline;
+}
 
 function renderWaypoints(list) {
   list.forEach(({ name, px, py, size }) => {
@@ -558,44 +665,3 @@ document.querySelectorAll('.section-toggle').forEach(button => {
     }
   });
 });
-
-// SID/STAR definitions
-const SIDS_STARS = [
-  //sids
-  {
-    name: "",
-    type: "SID",
-    airport: "", //Icao
-    waypoints: ["", "", "", "", ""]
-  },
-
-  //stars
-  {
-    name: "",
-    type: "STAR",
-    airport: "",
-    waypoints: ["", "", "", "", ""]
-  },
-  // Add more SIDs/STARs here...
-];
-
-// Get waypoint objects for a SID/STAR by name
-function getSidStarWaypoints(sidStarName) {
-  const sidStar = SIDS_STARS.find(s => s.name === sidStarName);
-  if (!sidStar) return [];
-  return sidStar.waypoints.map(wpName => Waypoints.find(wp => wp.name === wpName)).filter(Boolean);
-}
-
-// Render SID/STAR route on map
-function renderSidStarRoute(sidStarName, options = {}) {
-  const waypoints = getSidStarWaypoints(sidStarName);
-  if (waypoints.length < 2) return null;
-  const latLngs = waypoints.map(wp => apiPositionToLatLng(wp.px, wp.py));
-  const polyline = L.polyline(latLngs, {
-    color: options.color || 'orange',
-    weight: options.weight || 3,
-    dashArray: options.dashArray || '8,8',
-    opacity: options.opacity || 0.8
-  }).addTo(map);
-  return polyline;
-}
