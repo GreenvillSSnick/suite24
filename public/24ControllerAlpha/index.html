@@ -617,7 +617,7 @@ setInterval(fetchAndPlotAircraft, 5000);
         let code;
         do {
           code = Math.floor(1000 + Math.random() * 9000);
-        } while (code === 0000);
+        } while (code == "0000");
         return code.toString();
       };
       document.getElementById('atisBtn').addEventListener('click', () => {
