@@ -433,7 +433,7 @@ const scale = Math.min(scaleX, scaleY);
         maxBounds: imageBounds,
         maxBoundsViscosity: 1.0
       }).setView([imageHeight / 2, imageWidth / 2], 0);
-      L.imageOverlay('map.png', imageBounds).addTo(map);
+      L.imageOverlay('/unified/images/map/edit.png', imageBounds).addTo(map);
       map.setView([imageHeight / 2, imageWidth / 2], 0);
       map.setMaxBounds(imageBounds);
       map.attributionControl.addAttribution('<a href:"https://guns.lol/greenvillssnick">GreenvillSSnick</a>');
@@ -450,7 +450,7 @@ const aircraftMarkers = new Map();
 
       async function fetchAndPlotAircraft() {
   try {
-    const response = await fetch('https://24controllerdata.devp1234567891.workers.dev/');
+    const response = await fetch('/api/acft-data');
     const data = await response.json();
     const callsigns = Object.keys(data);
     const activeSet = new Set(callsigns);
@@ -476,7 +476,7 @@ const aircraftMarkers = new Map();
       } else {
         const icon = L.divIcon({
           className: 'aircraft-icon',
-          html: `<img src="icons/aircraft/default/testaircraft.png" style="transform: rotate(${heading}deg); width: 32px; height: 32px;">`,
+          html: `<img src="/unified/icons/aircraft/default/testaircraft.png" style="transform: rotate(${heading}deg); width: 32px; height: 32px;">`,
           iconSize: [32, 32],
           iconAnchor: [16, 16]
         });
@@ -617,7 +617,7 @@ setInterval(fetchAndPlotAircraft, 5000);
         let code;
         do {
           code = Math.floor(1000 + Math.random() * 9000);
-        } while (code === 0000);
+        } while (code == "0000");
         return code.toString();
       };
       document.getElementById('atisBtn').addEventListener('click', () => {

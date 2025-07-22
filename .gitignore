@@ -69,3 +69,4 @@ node_modules/
 .dataconnect
 api_requests.txt
 aircraft.db
+.DS_Store
