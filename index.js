@@ -3,12 +3,18 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const db = require('./acft-db');
+const cors = require('cors');
 
 const app = express();
 const PORT = 3000;
 
 let aircraftData = {};
-let flightPlans = {};
+let eventAircraftData = {};
+let flightPlans = new Map();
+let eventFlightPlans = new Map();
+let controllers = {};
+
+const allowedOrigins = ['https://24flight.tristan-industries.org', 'http://localhost:3000/api/flight-plan', 'http://localhost:3000/24Pilot'];
 
 app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.json())
@@ -41,7 +47,23 @@ ws.on('message', (data) => {
         }
       }
     } else if (msg.t === 'FLIGHT_PLAN') {
-      flightPlans = msg.d;
+      for (const [robloxName, newPlan] of Object.entries(msg.d)) {
+        if (flightPlans.has(robloxName)) {
+          flightPlans.delete(robloxName);
+        }
+        flightPlans.set(robloxName, newPlan);
+      }
+
+      console.log('Flight plans updated');
+    } else if (msg.t === 'EVENT_ACFT_DATA') {
+      eventAircraftData = msg.d;
+    } else if (msg.t === 'EVENT_FLIGHT_PLAN') {
+      eventFlightPlans.clear();
+      for (const [robloxName, plan] of Object.entries(msg.d)) {
+        eventFlightPlans.set(robloxName, plan);
+      }
+    } else if (msg.t === 'CONTROLLERS') {
+      controllers = msg.d;
     }
   } catch (e) {
     console.error('Invalid JSON:', e);
@@ -73,6 +95,30 @@ setInterval(() => {
   db.run(`DELETE FROM aircraft_paths WHERE timestamp < ?`, cutoff);
 }, 60 * 1000);
 
+setInterval(() => {
+  const now = Date.now();
+  for (const [robloxName, plan] of flightPlans.entries()) {
+    if (now - plan.timestamp > 24 * 60 * 60 * 1000) {
+      flightPlans.delete(robloxName);
+    }
+  }
+}, 60 * 1000);
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [robloxName, plan] of eventFlightPlans.entries()) {
+    if (now - plan.timestamp > 24 * 60 * 60 * 1000) {
+      eventFlightPlans.delete(robloxName);
+    }
+  }
+}, 60 * 1000);
+
+app.use(cors({
+  origin: allowedOrigins, 
+  methods: ['GET', 'POST', 'DELETE'], 
+  credentials: false
+}));
+
 app.get('/api/acft-data', (req, res) => {
   res.json({ aircraftData });
 
@@ -91,8 +137,8 @@ app.get('/api/acft-data', (req, res) => {
   });
 });
 
-app.get('/api/flight-plan', (req, res) => {
-  res.json({ flightPlans });
+app.get('/api/acft-data/event', (req, res) => {
+  res.json({ eventAircraftData });
 
   // log stuff
   const logEntry = {
@@ -107,6 +153,16 @@ app.get('/api/flight-plan', (req, res) => {
   fs.appendFile('api_requests.txt', JSON.stringify(logEntry) + '\n', (err) => {
     if (err) console.error(err);
   });
+});
+
+app.get('/api/flight-plans', (req, res) => {
+  const allPlans = Object.fromEntries(flightPlans.entries());
+  res.json(allPlans);
+});
+
+app.get('/api/flight-plans/event', (req, res) => {
+  const allPlans = Object.fromEntries(eventFlightPlans.entries());
+  res.json(allPlans);
 });
 
 // get = read
