@@ -370,10 +370,10 @@ const Waypoints = [
   { name: "GAVIN", px: 8361.54, py: 7141.78, size: 64 }, //Gavin
   { name: "SILVA", px: 10018.82, py: 7159.46, size: 64 }, //Silva
   { name: "OCEEN", px: 9143.77, py: 7716.3, size: 64 }, //Oceen?
-  { name: "GERLD", px: 5077.91, py: 4605.03, size: 64 }, //?
-  { name: "RENDR", px: 5687.79, py: 4772.97, size: 64 }, //?
-  { name: "WELSH", px: 5687.79, py: 6249.06, size: 64 }, //?
-  { name: "JOOPY", px: 7115.26, py: 4631.55, size: 64 }, //?
+  { name: "GERLD", px: 5077.91, py: 4605.03, size: 64 }, //Gerald
+  { name: "RENDR", px: 5687.79, py: 4772.97, size: 64 }, //Render
+  { name: "WELSH", px: 5687.79, py: 6249.06, size: 64 }, //Whelsh
+  { name: "JOOPY", px: 7115.26, py: 4631.55, size: 64 }, //Jhoophy
 
   // Perth
   { name: "CRAZY", px: 0, py: 0, size: 64 }, //crazy
