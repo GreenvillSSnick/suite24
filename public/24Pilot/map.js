@@ -499,11 +499,9 @@ function renderSidStarRoute(sidStarName, options = {}) {
     opacity: options.opacity || 0.8
   }).addTo(map);
 
-  // Add popups/labels for each leg
   for (let i = 0; i < waypoints.length - 1; i++) {
     const wpA = waypoints[i];
     const wpB = waypoints[i + 1];
-    // Midpoint for label
     const midLat = (waypointPositionToLatLng(wpA.px, wpA.py)[0] + waypointPositionToLatLng(wpB.px, wpB.py)[0]) / 2;
     const midLng = (waypointPositionToLatLng(wpA.px, wpA.py)[1] + waypointPositionToLatLng(wpB.px, wpB.py)[1]) / 2;
     const label = L.popup({
@@ -523,7 +521,7 @@ renderWaypoints(Waypoints);
 map.on("zoomend", () => {
   const zoom = map.getZoom();
   document.querySelectorAll(".waypoint-wrapper img").forEach(img => {
-    const baseSize = 64; // your full size at zoom level 0
+    const baseSize = 64;
     const adjustedSize = baseSize * Math.pow(0.85, Math.abs(zoom));
     img.style.width = `${adjustedSize}px`;
     img.style.height = `${adjustedSize}px`;

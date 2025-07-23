@@ -8,20 +8,18 @@ const cors = require('cors');
 const app = express();
 const PORT = 3000;
 
+const allowedOrigins = ['https://24flight.tristan-industries.org', 'http://localhost:3000/api/flight-plan', 'http://localhost:3000/24Pilot'];
+const FLIGHT_PLAN_FILE = path.join(__dirname, 'flightPlans.json');
+const EVENT_FLIGHT_PLAN_FILE = path.join(__dirname, 'eventFlightPlans.json');
+
 let aircraftData = {};
 let eventAircraftData = {};
-let flightPlans = new Map();
-let eventFlightPlans = new Map();
+let flightPlans = loadFlightPlans();
+let eventFlightPlans = eventLoadFlightPlans();
 let controllers = {};
-
-const allowedOrigins = ['https://24flight.tristan-industries.org', 'http://localhost:3000/api/flight-plan', 'http://localhost:3000/24Pilot'];
 
 app.use(express.static(path.join(__dirname, '/public')));
 app.use(express.json())
-
-app.listen(PORT, () => {
-  console.log(`running at http://localhost:${PORT}`);
-});
 
 const ws = new WebSocket('wss://24data.ptfs.app/wss', {
   headers: {
@@ -47,21 +45,11 @@ ws.on('message', (data) => {
         }
       }
     } else if (msg.t === 'FLIGHT_PLAN') {
-      for (const [robloxName, newPlan] of Object.entries(msg.d)) {
-        if (flightPlans.has(robloxName)) {
-          flightPlans.delete(robloxName);
-        }
-        flightPlans.set(robloxName, newPlan);
-      }
-
-      console.log('Flight plans updated');
+      handleNewPlans(msg.d);
     } else if (msg.t === 'EVENT_ACFT_DATA') {
       eventAircraftData = msg.d;
     } else if (msg.t === 'EVENT_FLIGHT_PLAN') {
-      eventFlightPlans.clear();
-      for (const [robloxName, plan] of Object.entries(msg.d)) {
-        eventFlightPlans.set(robloxName, plan);
-      }
+      eventHandleNewPlans(msg.d);
     } else if (msg.t === 'CONTROLLERS') {
       controllers = msg.d;
     }
@@ -78,6 +66,43 @@ ws.on('error', (err) => {
   console.error('WebSocket error:', err);
 });
 
+function loadFlightPlans() {
+  if (!fs.existsSync(FLIGHT_PLAN_FILE)) return [];
+  try {
+    const data = fs.readFileSync(FLIGHT_PLAN_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (e) {
+    console.error('Error reading flight plan file:', e);
+    return [];
+  }
+}
+
+// regular fpl
+
+function saveFlightPlans() {
+  fs.writeFileSync(FLIGHT_PLAN_FILE, JSON.stringify(flightPlans, null, 2));
+}
+
+function addFlightPlan(newPlan) {
+  // Remove expired (older than 24h)
+  const now = Date.now();
+  flightPlans = flightPlans.filter(p => now - p.timestamp < 24 * 60 * 60 * 1000);
+
+  // Remove previous plan for same robloxName
+  flightPlans = flightPlans.filter(p => p.robloxName !== newPlan.robloxName);
+
+  // Add with timestamp
+  flightPlans.push({ ...newPlan, timestamp: now });
+
+  saveFlightPlans();
+}
+
+function handleNewPlans(data) {
+  for (const [robloxName, plan] of Object.entries(data)) {
+    addFlightPlan({ robloxName, ...plan });
+  }
+}
+
 function storeAircraftUpdate(callsign, x, y) {
   const now = Date.now();
   const stmt = db.prepare(`
@@ -86,6 +111,43 @@ function storeAircraftUpdate(callsign, x, y) {
   `);
   stmt.run(callsign, x, y, now);
   stmt.finalize();
+}
+
+//event fpl
+
+function eventLoadFlightPlans() {
+  if (!fs.existsSync(EVENT_FLIGHT_PLAN_FILE)) return [];
+  try {
+    const data = fs.readFileSync(EVENT_FLIGHT_PLAN_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (e) {
+    console.error('Error reading flight plan file:', e);
+    return [];
+  }
+}
+
+function eventSaveFlightPlans() {
+  fs.writeFileSync(EVENT_FLIGHT_PLAN_FILE, JSON.stringify(eventFlightPlans, null, 2));
+}
+
+function eventAddFlightPlan(newPlan) {
+  // Remove expired (older than 24h)
+  const now = Date.now();
+  eventFlightPlans = eventFlightPlans.filter(p => now - p.timestamp < 24 * 60 * 60 * 1000);
+
+  // Remove previous plan for same robloxName
+  eventFlightPlans = eventFlightPlans.filter(p => p.robloxName !== newPlan.robloxName);
+
+  // Add with timestamp
+  eventFlightPlans.push({ ...newPlan, timestamp: now });
+
+  eventSaveFlightPlans();
+}
+
+function eventHandleNewPlans(data) {
+  for (const [robloxName, plan] of Object.entries(data)) {
+    eventAddFlightPlan({ robloxName, ...plan });
+  }
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -97,20 +159,12 @@ setInterval(() => {
 
 setInterval(() => {
   const now = Date.now();
-  for (const [robloxName, plan] of flightPlans.entries()) {
-    if (now - plan.timestamp > 24 * 60 * 60 * 1000) {
-      flightPlans.delete(robloxName);
-    }
-  }
+  flightPlans = flightPlans.filter(plan => now - plan.timestamp < 24 * 60 * 60 * 1000);
 }, 60 * 1000);
 
 setInterval(() => {
   const now = Date.now();
-  for (const [robloxName, plan] of eventFlightPlans.entries()) {
-    if (now - plan.timestamp > 24 * 60 * 60 * 1000) {
-      eventFlightPlans.delete(robloxName);
-    }
-  }
+  eventFlightPlans = eventFlightPlans.filter(plan => now - plan.timestamp < 24 * 60 * 60 * 1000);
 }, 60 * 1000);
 
 app.use(cors({
@@ -118,6 +172,11 @@ app.use(cors({
   methods: ['GET', 'POST', 'DELETE'], 
   credentials: false
 }));
+
+
+app.get('/api/', (req, res) => {
+  res.json = "{API is ok!}"
+});
 
 app.get('/api/acft-data', (req, res) => {
   res.json({ aircraftData });
@@ -150,7 +209,7 @@ app.get('/api/acft-data/event', (req, res) => {
     headers: req.headers,
   };
 
-  fs.appendFile('api_requests.txt', JSON.stringify(logEntry) + '\n', (err) => {
+  fs.appendFile('api_requests.log', JSON.stringify(logEntry) + '\n', (err) => {
     if (err) console.error(err);
   });
 });
@@ -167,7 +226,7 @@ app.get('/api/flight-plans/event', (req, res) => {
   res.json(allPlans);
 });
 
-app.get('/api/acft-data', (req, res) => {
+app.get('/api/controllers', (req, res) => {
   res.json({ controllers });
 
   // log stuff
@@ -180,7 +239,7 @@ app.get('/api/acft-data', (req, res) => {
     headers: req.headers,
   };
 
-  fs.appendFile('api_requests.txt', JSON.stringify(logEntry) + '\n', (err) => {
+  fs.appendFile('api_requests.log', JSON.stringify(logEntry) + '\n', (err) => {
     if (err) console.error(err);
   });
 });
@@ -277,4 +336,19 @@ app.delete('/api/paths/:callsign', (req, res) => {
   fs.appendFile('api_requests.txt', JSON.stringify(logEntry) + '\n', (err) => {
     if (err) console.error(err);
   });
+});
+
+app.use((req, res) => {
+  res.status(404).sendFile(path.join(__dirname, 'public', 'error.html'));
+});
+
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  const status = err.status || 500;
+  res.status(status).sendFile(path.join(__dirname, 'public', 'error.html'));
+});
+
+
+app.listen(PORT, () => {
+  console.log(`running at http://localhost:${PORT}`);
 });
