@@ -10,11 +10,12 @@ const PORT = 3000;
 
 const allowedOrigins = ['https://24flight.tristan-industries.org', 'http://localhost:3000/api/flight-plan', 'http://localhost:3000/24Pilot'];
 const FLIGHT_PLAN_FILE = path.join(__dirname, 'flightPlans.json');
+const EVENT_FLIGHT_PLAN_FILE = path.join(__dirname, 'eventFlightPlans.json');
 
 let aircraftData = {};
 let eventAircraftData = {};
 let flightPlans = loadFlightPlans();
-let eventFlightPlans = new Map();
+let eventFlightPlans = eventLoadFlightPlans();
 let controllers = {};
 
 app.use(express.static(path.join(__dirname, '/public')));
@@ -48,10 +49,7 @@ ws.on('message', (data) => {
     } else if (msg.t === 'EVENT_ACFT_DATA') {
       eventAircraftData = msg.d;
     } else if (msg.t === 'EVENT_FLIGHT_PLAN') {
-      eventFlightPlans.clear();
-      for (const [robloxName, plan] of Object.entries(msg.d)) {
-        eventFlightPlans.set(robloxName, plan);
-      }
+      eventHandleNewPlans(msg.d);
     } else if (msg.t === 'CONTROLLERS') {
       controllers = msg.d;
     }
@@ -79,6 +77,8 @@ function loadFlightPlans() {
   }
 }
 
+// regular fpl
+
 function saveFlightPlans() {
   fs.writeFileSync(FLIGHT_PLAN_FILE, JSON.stringify(flightPlans, null, 2));
 }
@@ -98,15 +98,8 @@ function addFlightPlan(newPlan) {
 }
 
 function handleNewPlans(data) {
-  if (typeof data === 'object' && data.robloxName && typeof data.robloxName === 'string') {
-    addFlightPlan({ ...data });
-    return;
-  }
-
   for (const [robloxName, plan] of Object.entries(data)) {
-    if (typeof plan === 'object') {
-      addFlightPlan({ robloxName, ...plan });
-    }
+    addFlightPlan({ robloxName, ...plan });
   }
 }
 
@@ -120,11 +113,58 @@ function storeAircraftUpdate(callsign, x, y) {
   stmt.finalize();
 }
 
+//event fpl
+
+function eventLoadFlightPlans() {
+  if (!fs.existsSync(EVENT_FLIGHT_PLAN_FILE)) return [];
+  try {
+    const data = fs.readFileSync(EVENT_FLIGHT_PLAN_FILE, 'utf8');
+    return JSON.parse(data);
+  } catch (e) {
+    console.error('Error reading flight plan file:', e);
+    return [];
+  }
+}
+
+function eventSaveFlightPlans() {
+  fs.writeFileSync(EVENT_FLIGHT_PLAN_FILE, JSON.stringify(eventFlightPlans, null, 2));
+}
+
+function eventAddFlightPlan(newPlan) {
+  // Remove expired (older than 24h)
+  const now = Date.now();
+  eventFlightPlans = eventFlightPlans.filter(p => now - p.timestamp < 24 * 60 * 60 * 1000);
+
+  // Remove previous plan for same robloxName
+  eventFlightPlans = eventFlightPlans.filter(p => p.robloxName !== newPlan.robloxName);
+
+  // Add with timestamp
+  eventFlightPlans.push({ ...newPlan, timestamp: now });
+
+  eventSaveFlightPlans();
+}
+
+function eventHandleNewPlans(data) {
+  for (const [robloxName, plan] of Object.entries(data)) {
+    eventAddFlightPlan({ robloxName, ...plan });
+  }
+}
+
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 setInterval(() => {
   const cutoff = Date.now() - DAY_MS;
   db.run(`DELETE FROM aircraft_paths WHERE timestamp < ?`, cutoff);
+}, 60 * 1000);
+
+setInterval(() => {
+  const now = Date.now();
+  flightPlans = flightPlans.filter(plan => now - plan.timestamp < 24 * 60 * 60 * 1000);
+}, 60 * 1000);
+
+setInterval(() => {
+  const now = Date.now();
+  eventFlightPlans = eventFlightPlans.filter(plan => now - plan.timestamp < 24 * 60 * 60 * 1000);
 }, 60 * 1000);
 
 app.use(cors({
@@ -175,9 +215,10 @@ app.get('/api/acft-data/event', (req, res) => {
 });
 
 app.get('/api/flight-plans', (req, res) => {
-  const now = Date.now();
-  const validPlans = flightPlans.filter(p => now - p.timestamp < 24 * 60 * 60 * 1000);
-  res.json(validPlans);
+  const wrappedPlans = Object.fromEntries(
+    Array.from(flightPlans.entries()).map(([key, value]) => [key, { flightPlan: value }])
+  );
+  res.json(wrappedPlans);
 });
 
 app.get('/api/flight-plans/event', (req, res) => {
@@ -185,7 +226,7 @@ app.get('/api/flight-plans/event', (req, res) => {
   res.json(allPlans);
 });
 
-app.get('/api/acft-data', (req, res) => {
+app.get('/api/controllers', (req, res) => {
   res.json({ controllers });
 
   // log stuff
