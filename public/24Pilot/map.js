@@ -1,5 +1,3 @@
-//image
-
 const imageWidth = 14453;
 const imageHeight = 13800;
 const imageBounds = [[0, 0], [imageHeight, imageWidth]];
@@ -333,45 +331,49 @@ const Waypoints = [
   { name: "DEATH", px: 4556.42, py: 14033.86, size: 64 },
 
   // Larnaca
-  { name: "RENTS", px: 0, py: 0, size: 64 }, //Rents
-  { name: "GRASS", px: 0, py: 0, size: 64 }, //Grass
-  { name: "AQWRT", px: 0, py: 0, size: 64 }, //Aquirt
-  { name: "FORIA", px: 0, py: 0, size: 64 }, //Forya
-  { name: "FORCE", px: 0, py: 0, size: 64 }, //Force
-  { name: "MASEV", px: 0, py: 0, size: 64 }, //Masiv
-  { name: "ALTRS", px: 0, py: 0, size: 64 }, //Alters
-  { name: "MUONE", px: 0, py: 0, size: 64 }, //Mew Own
-  { name: "JAZZR", px: 0, py: 0, size: 64 }, //Jazzer
-  { name: "NUBER", px: 0, py: 0, size: 64 }, //New ber
-  { name: "BOBUX", px: 0, py: 0, size: 64 }, //Bobux
-  { name: "DEBUG", px: 0, py: 0, size: 64 }, //Debug
-  { name: "JACKI", px: 0, py: 0, size: 64 }, //Jacky
+  { name: "RENTS", px: 11320.34, py: 10213.27, size: 64 }, //Rents
+  { name: "GRASS", px: 10182.34, py: 10739.18, size: 64 }, //Grass
+  { name: "AQWRT", px: 9766.91, py: 12330.17, size: 64 }, //Aquirt
+  { name: "FORIA", px: 8449.93, py: 13218.48, size: 64 }, //Forya
+  { name: "FORCE", px: 10469.6, py: 14239.36, size: 64 }, //Force
+  { name: "MASEV", px: 11592.13, py: 14279.14, size: 64 }, //Masiv
+  { name: "ALTRS", px: 12811.89, py: 14252.62, size: 64 }, //Alters
+  { name: "MUONE", px: 13267.09, py: 13214.06, size: 64 }, //Mew Own
+  { name: "JAZZR", px: 14539.88, py: 13227.32, size: 64 }, //Jazzer
+  { name: "NUBER", px: 15755.22, py: 12414.14, size: 64 }, //New ber
+  { name: "BOBUX", px: 13457.13, py: 12188.75, size: 64 }, //Bobux
+  { name: "DEBUG", px: 14557.56, py: 11318.13, size: 64 }, //Debug
+  { name: "JACKI", px: 12599.76, py: 11304.87, size: 64 }, //Jacky
 
   // Skopelos
   { name: "CAWZE", px: 10343.65, py: 8030.08, size: 64 }, //Cawz ey
   { name: "ANYMS", px: 9669.69, py: 9644.53, size: 64 }, //Ay nims
 
   // Izolirani
-  { name: "CAMEL", px: 0, py: 0, size: 64 }, //Camel
-  { name: "CYRIL", px: 0, py: 0, size: 64 }, //S eye ril, sir il
-  { name: "DUNKS", px: 0, py: 0, size: 64 }, //Dunks
-  { name: "DOGGO", px: 0, py: 0, size: 64 }, //Dog Oh
-  { name: "JUSTY", px: 0, py: 0, size: 64 }, //Justy
-  { name: "CHAIN", px: 0, py: 0, size: 64 }, //Chain
-  { name: "BILLO", px: 0, py: 0, size: 64 }, //Bill oh
-  { name: "ABSRS", px: 0, py: 0, size: 64 }, //Abserse
-  { name: "MORRD", px: 0, py: 0, size: 64 }, //Mord
-  { name: "LLIME", px: 0, py: 0, size: 64 }, //Lime
-  { name: "UDMUG", px: 0, py: 0, size: 64 }, //Uhd mug
-  { name: "ROSMO", px: 0, py: 0, size: 64 }, //Ros moh
+  { name: "CAMEL", px: 10703.83, py: 5979.47, size: 64 }, //Camel
+  { name: "CYRIL", px: 11512.58, py: 6995.94, size: 64 }, //S eye ril, sir il
+  { name: "DUNKS", px: 11768.91, py: 6028.09, size: 64 }, //Dunks
+  { name: "DOGGO", px: 12909.12, py: 8012.4, size: 64 }, //Dog Oh
+  { name: "JUSTY", px: 13262.67, py: 9333.81, size: 64 }, //Justy
+  { name: "CHAIN", px: 15764.06, py: 9766.91, size: 64 }, //Chain
+  { name: "BILLO", px: 14557.56, py: 8586.93, size: 64 }, //Bill oh
+  { name: "ABSRS", px: 15768.48, py: 7919.6, size: 64 }, //Abserse
+  { name: "MORRD", px: 15087.89, py: 6624.71, size: 64 }, //Mord
+  { name: "LLIME", px: 15538.67, py: 5670.11, size: 64 }, //Lime
+  { name: "UDMUG", px: 15083.47, py: 4808.33, size: 64 }, //Uhd mug
+  { name: "ROSMO", px: 13474.8, py: 5484.5, size: 64 }, //Ros moh
 
   // Saint Barts
-  { name: "PROBE", px: 0, py: 0, size: 64 }, //Probe
-  { name: "DINER", px: 0, py: 0, size: 64 }, //Diner
-  { name: "INDEX", px: 0, py: 0, size: 64 }, //Index
-  { name: "GAVIN", px: 0, py: 0, size: 64 }, //Gavin
-  { name: "SILVA", px: 0, py: 0, size: 64 }, //Silva
-  { name: "OCEEN", px: 0, py: 0, size: 64 }, //Oceen?
+  { name: "PROBE", px: 6306.51, py: 5351.91, size: 64 }, //Probe
+  { name: "DINER", px: 8012.4, py: 5427.04, size: 64 }, //Diner
+  { name: "INDEX", px: 6505.38, py: 6819.16, size: 64 }, //Index
+  { name: "GAVIN", px: 8361.54, py: 7141.78, size: 64 }, //Gavin
+  { name: "SILVA", px: 10018.82, py: 7159.46, size: 64 }, //Silva
+  { name: "OCEEN", px: 9143.77, py: 7716.3, size: 64 }, //Oceen?
+  { name: "GERLD", px: 5077.91, py: 4605.03, size: 64 }, //?
+  { name: "RENDR", px: 5687.79, py: 4772.97, size: 64 }, //?
+  { name: "WELSH", px: 5687.79, py: 6249.06, size: 64 }, //?
+  { name: "JOOPY", px: 7115.26, py: 4631.55, size: 64 }, //?
 
   // Perth
   { name: "CRAZY", px: 0, py: 0, size: 64 }, //crazy
