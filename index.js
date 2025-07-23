@@ -98,8 +98,14 @@ function addFlightPlan(newPlan) {
 }
 
 function handleNewPlans(data) {
+  if (typeof data === 'object' && data.robloxName && typeof data.robloxName === 'string') {
+    addFlightPlan({ ...data });
+    return;
+  }
   for (const [robloxName, plan] of Object.entries(data)) {
-    addFlightPlan({ robloxName, ...plan });
+    if (typeof plan === 'object') {
+      addFlightPlan({ robloxName, ...plan });
+    }
   }
 }
 
@@ -145,8 +151,14 @@ function eventAddFlightPlan(newPlan) {
 }
 
 function eventHandleNewPlans(data) {
+  if (typeof data === 'object' && data.robloxName && typeof data.robloxName === 'string') {
+    eventAddFlightPlan({ ...data });
+    return;
+  }
   for (const [robloxName, plan] of Object.entries(data)) {
-    eventAddFlightPlan({ robloxName, ...plan });
+    if (typeof plan === 'object') {
+      eventAddFlightPlan({ robloxName, ...plan });
+    }
   }
 }
 
@@ -166,6 +178,42 @@ setInterval(() => {
   const now = Date.now();
   eventFlightPlans = eventFlightPlans.filter(plan => now - plan.timestamp < 24 * 60 * 60 * 1000);
 }, 60 * 1000);
+
+setInterval(() => {
+  const now = Date.now();
+
+  flightPlans = flightPlans.filter(plan => now - plan.timestamp < 24 * 60 * 60 * 1000);
+  eventFlightPlans = eventFlightPlans.filter(plan => now - plan.timestamp < 24 * 60 * 60 * 1000);
+
+  try {
+    const data = fs.readFileSync(FLIGHT_PLAN_FILE, 'utf8');
+    const parsed = JSON.parse(data);
+    if (Array.isArray(parsed)) flightPlans = parsed;
+  } catch (err) {
+    console.error('[FLIGHT_PLAN_FILE] Reload failed:', err.message);
+  }
+
+  try {
+    const data = fs.readFileSync(EVENT_FLIGHT_PLAN_FILE, 'utf8');
+    const parsed = JSON.parse(data);
+    if (Array.isArray(parsed)) eventFlightPlans = parsed;
+  } catch (err) {
+    console.error('[EVENT_FLIGHT_PLAN_FILE] Reload failed:', err.message);
+  }
+
+  try {
+    fs.writeFileSync(FLIGHT_PLAN_FILE, JSON.stringify(flightPlans, null, 2));
+  } catch (err) {
+    console.error('[FLIGHT_PLAN_FILE] Save failed:', err.message);
+  }
+
+  try {
+    fs.writeFileSync(EVENT_FLIGHT_PLAN_FILE, JSON.stringify(eventFlightPlans, null, 2));
+  } catch (err) {
+    console.error('[EVENT_FLIGHT_PLAN_FILE] Save failed:', err.message);
+  }
+
+}, 15000);
 
 app.use(cors({
   origin: allowedOrigins, 
