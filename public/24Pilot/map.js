@@ -7,6 +7,8 @@ const ptfsBounds = {
   bottom_right: { x:  47132.9, y:  46139.2 }
 };
 
+const flightPlans = new Map();
+
 const ptfsCenter = {
   x: (ptfsBounds.top_left.x + ptfsBounds.bottom_right.x) / 2,
   y: (ptfsBounds.top_left.y + ptfsBounds.bottom_right.y) / 2
@@ -133,6 +135,32 @@ async function fetchAircraftData() {
   plotAircraft(aircraft);
 }
 
+function updateFlightPlans(rawPlans) {
+  flightPlansMap.clear();
+  for (const [robloxName, plan] of Object.entries(rawPlans)) {
+    flightPlansMap.set(robloxName, plan);
+  }
+}
+
+async function fetchFlightPlans() {
+  const res = await fetch('/api/flight-plans');
+  const raw = await res.json();
+
+  const formatted = {};
+
+  for (const key in raw) {
+    const entry = raw[key];
+    const plan = entry.flightPlan;
+
+    if (plan?.robloxName) {
+      formatted[plan.robloxName] = plan;
+    }
+  }
+
+  const first = Object.values(formatted)[0];
+  updateFlightPlans(formatted);
+}
+
 async function updateVisibleAircraftTrails() {
   for (const [callsign, visible] of aircraftTrailVisible.entries()) {
     if (visible) {
@@ -149,6 +177,7 @@ async function updateVisibleAircraftTrails() {
 }
 
 setInterval(fetchAircraftData, 500);
+setInterval(fetchFlightPlans, 500);
 setInterval(updateVisibleAircraftTrails, 500);
 
 async function plotAircraft(data) {
@@ -192,9 +221,27 @@ async function plotAircraft(data) {
       marker.on("click", async (e) => {
         L.DomEvent.stopPropagation(e);
         const sidebar = document.getElementById("aircraft-sidebar");
+        const flightPlan = flightPlansMap.get(ac.playerName);
         sidebar.classList.remove("hidden");
         sidebar.style.left = "150px";
         sidebar.style.right = "auto";
+
+        if (flightPlan) {
+          document.getElementById("route-label").textContent = `${flightPlan.departing} → ${flightPlan.arriving}`;
+          document.getElementById("FlightPlan-Departure").textContent = flightPlan.departing || "N/A";
+          document.getElementById("FlightPlan-Arrival").textContent = flightPlan.arriving || "N/A";
+          document.getElementById("FlightPlan-Route").textContent = flightPlan.route || "N/A";
+          document.getElementById("FlightPlan-FlightLevel").textContent = flightPlan.flightlevel ? `FL${flightPlan.flightlevel}` : "N/A";
+          document.getElementById("FlightPlan-FlightRules").textContent = flightPlan.flightrules || "N/A";
+        } else {
+          document.getElementById("route-label").textContent = "NO FLIGHT PLAN";
+          document.getElementById("FlightPlan-Departure").textContent = "N/A";
+          document.getElementById("FlightPlan-Arrival").textContent = "N/A";
+          document.getElementById("FlightPlan-Route").textContent = "N/A";
+          document.getElementById("FlightPlan-FlightLevel").textContent = "N/A";
+          document.getElementById("FlightPlan-FlightRules").textContent = "N/A";
+        }
+
         document.getElementById("aircraft-image").src = ac.imageUrl || "/unified/images/plane/vulcanlong.png";
         document.getElementById("callsign").textContent = callsign || "N/A";
         document.getElementById("aircraft-type").textContent = ac.aircraftTypeFull || ac.aircraftType || "N/A";
@@ -314,20 +361,20 @@ const Waypoints = [
   { name: "SAWPE", px: 3277.34, py: 8505.47, size: 64 }, //Saw pee
   { name: "BEANS", px: 3355.44, py: 9736.53, size: 64 }, //Beans
   { name: "LOGAN", px: 4395.31, py: 9970.31, size: 64 }, //Logan
-  { name: "EXMOR", px: 4577.41, py: 10896.63, size: 64 },
-  { name: "QUEEN", px: 7062.23, py: 9241, size: 64 },
-  { name: "MOGTA", px: 5718.73, py: 10398.89, size: 64 },
-  { name: "LAVNO", px: 7721.88, py: 9537.1, size: 64 },
+  { name: "EXMOR", px: 4577.41, py: 10896.63, size: 64 }, //exhmore
+  { name: "QUEEN", px: 7062.23, py: 9241, size: 64 }, //queen
+  { name: "MOGTA", px: 5718.73, py: 10398.89, size: 64 }, //moghtha
+  { name: "LAVNO", px: 7721.88, py: 9537.1, size: 64 }, //lavno
   { name: "ICTAM", px: 5409.37, py: 8757.08, size: 64 }, //ichtham
-  { name: "ATPEV", px: 8186.97, py: 9353.7, size: 64 },
-  { name: "JAMSI", px: 8702.94, py: 10251.94, size: 64 },
-  { name: "GODLU", px: 7897.5, py: 10994.41, size: 64 },
-  { name: "LAZER", px: 8599.08, py: 11282.77, size: 64 },
-  { name: "PEPUL", px: 6128.63, py: 11217.59, size: 64 },
-  { name: "EMJAY", px: 5184.38, py: 12296.88, size: 64 },
-  { name: "ODOKU", px: 6843.75, py: 12306.25, size: 64 },
-  { name: "REAPR", px: 7192.6, py: 13494.69, size: 64 },
-  { name: "TRELN", px: 5875.62, py: 13722.29, size: 64 },
+  { name: "ATPEV", px: 8186.97, py: 9353.7, size: 64 }, //ath pev
+  { name: "JAMSI", px: 8702.94, py: 10251.94, size: 64 }, //jam see
+  { name: "GODLU", px: 7897.5, py: 10994.41, size: 64 }, //god loo
+  { name: "LAZER", px: 8599.08, py: 11282.77, size: 64 }, //laser
+  { name: "PEPUL", px: 6128.63, py: 11217.59, size: 64 }, //people
+  { name: "EMJAY", px: 5184.38, py: 12296.88, size: 64 }, //MJ
+  { name: "ODOKU", px: 6843.75, py: 12306.25, size: 64 }, //Odo ku
+  { name: "REAPR", px: 7192.6, py: 13494.69, size: 64 }, //Reaper
+  { name: "TRELN", px: 5875.62, py: 13722.29, size: 64 }, 
   { name: "DEATH", px: 4556.42, py: 14033.86, size: 64 },
 
   // Larnaca

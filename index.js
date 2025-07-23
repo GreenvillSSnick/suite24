@@ -270,8 +270,10 @@ app.get('/api/flight-plans', (req, res) => {
 });
 
 app.get('/api/flight-plans/event', (req, res) => {
-  const allPlans = Object.fromEntries(eventFlightPlans.entries());
-  res.json(allPlans);
+  const eventWrappedPlans = Object.fromEntries(
+    Array.from(eventFlightPlans.entries()).map(([key, value]) => [key, { flightPlan: value }])
+  );
+  res.json(eventWrappedPlans);
 });
 
 app.get('/api/controllers', (req, res) => {
